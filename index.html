@@ -182,6 +182,85 @@ function pR(){const L=load().filter(inR).sort((a,b)=>(a.d.dt||"").localeCompare(
  $("pv").innerHTML=`<h1>શ્રી નૃસિંહ કૃપા ગેસ એજન્સી</h1><p>હિસાબ: ${a?fd(a):"શરૂઆતથી"} થી ${b?fd(b):"આજ સુધી"} (${L.length} હિસાબ)</p>`+R.map(r=>r.h).join("")+`<div class="db"><b>કુલ ${L.length} હિસાબ:</b> રિફિલ રકમ ${f(sum("tot"))} &nbsp; | &nbsp; કેશ મળવી જોઈએ ${f(sum("exp"))} &nbsp; | &nbsp; ગણેલ કેશ ${f(sum("act"))}</div>`;
  const pv=$("pv");pv.style.setProperty("--w","741px");pv.style.setProperty("--z",1);pp()}
 window.openH=i=>{const x=load()[i];Object.keys(x.d).forEach(k=>{if($(k))$(k).value=x.d[k]});xs=(x.xs||[]).map(e=>({...e}));if(!x.xs&&x.exps)x.exps.forEach(e=>xs.push({c:e.c,a:e.a,r:e.nt||""}));if(n(x.d.khIn))xs.push({c:"અન્ય",a:n(x.d.khIn),r:""});$("khIn").value="";$("fh").value=x.d.fh||"";$("xtra").value=x.d.xtra||"";$("xtraR").value=x.d.xtraR||"";$("xtraS").value=x.d.xtraS||"";xtT();xs=xs.filter(e=>{if(e.c==="ફૂલ હાર"){$("fh").value=n($("fh").value)+e.a;return false}return true});cz=(x.cz||[]).map(e=>({...e}));rC();rX();calc();scrollTo(0,0)};
+window.del=i=>{const h=load();if(DB&&h[i]&&h[i].id){DB.doc("hisab/"+h[i].id).delete().catch(()=>alert("કાઢી શકાયું>${t[0]}</span><input type="number" inputmode="numeric" id="q${i}"><input type="number" inputmode="numeric" id="o${i}"><input type="number" inputmode="numeric" id="p${i}"><input type="number" inputmode="numeric" id="r${i}" value="${t[1]}"></div><div class="cs" id="c${i}" style="text-align:right;margin:-2px 0 6px"></div>`});
+$("rows").innerHTML=rows;
+$("notes").innerHTML=D.map(d=>`<div class="r"><span>${d} ×</span><input type="number" inputmode="numeric" id="n${d}"><span id="s${d}" style="width:70px;text-align:right">0</span></div>`).join("");
+$("dt").valueAsDate=new Date();
+const ids=()=>[...document.querySelectorAll("input")].map(e=>e.id).filter(i=>i&&!["ea","en","fa","fb"].includes(i));
+function calc(){
+ tot=0;
+ T.forEach((t,i)=>{const q=n($("q"+i).value),c=Math.max(0,q-n($("o"+i).value)-n($("p"+i).value)),r=n($("r"+i).value),a=c*r;tot+=a;$("c"+i).textContent=q?`કેશ ${c} × ${r} = ${f(a)}`:""});
+ cz.forEach((e,i)=>{const c=Math.max(0,n(e.q)-n(e.o)-n(e.p)),a=c*n(e.r);tot+=a;const el=$("cc"+i);if(el)el.textContent=n(e.q)?`કેશ ${c} × ${n(e.r)} = ${f(a)}`:""});
+ tot+=n($("xtra").value);
+ kh=xs.reduce((a,e)=>a+e.a,0);
+ $("xp").innerHTML=xs.filter(e=>e.a).map(e=>`<div class="r"><span>${esc(e.c)}${e.r?" · "+esc(e.r):""}</span><span>${f(e.a)}</span></div>`).join("");
+ exp=tot-n($("onl").value)-kh-n($("of").value)-n($("fh").value);
+ act=n($("pc").value);D.forEach(d=>{const s=d*n($("n"+d).value);$("s"+d).textContent=s;act+=s});
+ diff=act-exp;
+ $("tot").textContent=f(tot);$("exp").textContent=f(exp);$("act").textContent=f(act);
+ const b=$("diff");
+ if(!act&&!tot){b.textContent="";b.style.background="none";return}
+ if(Math.abs(diff)<0.5){b.textContent="✅ હિસાબ બરાબર";b.style.background="rgba(43,138,62,.15)";b.style.color="var(--ok)"}
+ else{b.textContent=(diff>0?"વધારો ":"ઘટ ")+f(Math.abs(diff));b.style.background="rgba(201,42,42,.12)";b.style.color="var(--bad)"}
+}
+const XC=["સરના કહેવાથી","ડિસ્કાઉન્ટ","પાણી ના જગ","ઉપાડ","જય રણછોડ","આદર્શ નિવાસી ચેક પેમેન્ટ","બાલ વિકાસ યોજના","ડીઝલ / પેટ્રોલ","ચા-નાસ્તો","રિપેરીંગ","પગાર","અન્ય"];
+const RM=["સરના કહેવાથી","બાલ વિકાસ યોજના","ડિસ્કાઉન્ટ","ઉપાડ","અન્ય"];
+let XU=[];try{XU=JSON.parse(localStorage.getItem("xu")||"[]")}catch(e){}
+const sXU=()=>{try{localStorage.setItem("xu",JSON.stringify(XU))}catch(e){}pushSet()};
+function pushSet(){if(DB)DB.doc("settings/main").set({xu:XU,hid:hid}).catch(()=>{})}
+const XL=()=>{const b=XC.filter(c=>c!=="અન્ય");return b.concat(XU,["અન્ય"])};
+function OP(cur){const L=XL();if(cur&&!L.includes(cur))L.unshift(cur);
+ return L.map(c=>`<option${c===cur?" selected":""}>${esc(c)}</option>`).join("")+'<option value="__add">➕ નવો પ્રકાર ઉમેરો</option>'+(XU.length?'<option value="__del">🗑 ઉમેરેલો પ્રકાર કાઢો</option>':"")}
+window.xsel=(i,v)=>{
+ if(v==="__add"){const nm=(prompt("નવા ખર્ચાનું નામ લખો (કાયમી રહેશે)")||"").trim();if(nm){if(!XL().includes(nm)){XU.push(nm);sXU()}xs[i].c=nm}}
+ else if(v==="__del"){const t=(prompt("કાઢવા માટે નંબર લખો:\n"+XU.map((x,k)=>(k+1)+". "+x).join("\n"))||"").trim(),k=parseInt(t)-1;if(XU[k]){XU.splice(k,1);sXU()}}
+ else xs[i].c=v;
+ rX();calc()};
+
+function rX(){$("xl").innerHTML=xs.map((e,i)=>`<div class="xw"><div class="xr"><select onchange="xsel(${i},this.value)">${OP(e.c)}</select><input type="number" inputmode="numeric" placeholder="રકમ ₹" value="${e.a||""}" oninput="xs[${i}].a=n(this.value);calc()"><span class="x" onclick="xd(${i})">✕</span></div>${RM.includes(e.c)?`<input class="l" style="margin-bottom:6px" placeholder="${e.c==="બાલ વિકાસ યોજના"?"ગ્રાહક નંબર લખો":"રિમાર્ક / નોંધ લખો"}" value="${esc(e.r||"").replace(/"/g,"&quot;")}" oninput="xs[${i}].r=this.value">`:""}</div>`).join("")}
+window.xd=i=>{xs.splice(i,1);rX();calc()};
+$("xa").onclick=()=>{xs.push({c:XC[0],a:0});rX()};
+rX();
+const HN={onl:"ચા",of:"ઓફિસ",fh:"ફૂલ હાર"};let hid=[];try{hid=JSON.parse(localStorage.getItem("hid")||"[]")}catch(e){}
+const sHid=()=>{try{localStorage.setItem("hid",JSON.stringify(hid))}catch(e){}pushSet()};
+function rH(){Object.keys(HN).forEach(k=>$("rw_"+k).style.display=hid.includes(k)?"none":"");$("rb").innerHTML=hid.map(k=>`<button class="s" style="width:auto;padding:6px 12px;margin:0 0 6px" onclick="sh('${k}')">➕ ${HN[k]}</button>`).join("")}
+window.hd=k=>{$(k).value="";if(!hid.includes(k))hid.push(k);sHid();rH();calc()};
+window.sh=k=>{hid=hid.filter(x=>x!==k);sHid();rH()};
+rH();
+function rC(){$("cz").innerHTML=cz.map((e,i)=>`<div class="g"><input class="l" style="font-size:12px;padding:9px 4px" placeholder="સાઈઝ" value="${esc(e.nm||"").replace(/"/g,"&quot;")}" oninput="cz[${i}].nm=this.value">${["q","o","p","r"].map(k=>`<input type="number" inputmode="numeric" value="${e[k]||""}" oninput="cz[${i}].${k}=this.value;calc()">`).join("")}</div><div class="cs" style="text-align:right;margin:-2px 0 6px"><span id="cc${i}"></span> <span class="x" onclick="cd(${i})">✕ કાઢો</span></div>`).join("")}
+const xlab=(S,R)=>{const a=[];if(S)a.push(S);if((S==="અન્ય"||!S)&&R)a.push(R);return a.join(" · ")};
+const xtT=()=>{$("xtraR").style.display=$("xtraS").value==="અન્ય"?"block":"none"};
+$("xtraS").addEventListener("change",xtT);
+window.cd=i=>{cz.splice(i,1);rC();calc()};
+$("ca").onclick=()=>{cz.push({nm:"",q:"",o:"",p:"",r:""});rC();calc()};
+document.addEventListener("input",calc);
+let H=null,DB=null;
+function load(){if(H)return H;try{const h=JSON.parse(localStorage.getItem("hisab")||"[]");h.forEach(x=>(x.xs||[]).forEach(e=>{if(e.r==="ખર્ચા")e.r=""}));return h}catch(e){return[]}}
+function save(a){try{localStorage.setItem("hisab",JSON.stringify(a))}catch(e){}}
+function snap(){const o={};ids().forEach(i=>o[i]=$(i).value);o.xtraS=$("xtraS").value;return o}
+const sm=x=>{const kh=n(x.d.khIn)+n(x.d.fh)+(x.xs||[]).reduce((a,e)=>a+e.a,0);return{kh,exp:x.tot-n(x.d.onl)-kh-n(x.d.of)}};
+const inR=x=>{const a=$("fa").value,b=$("fb").value,d=x.d.dt||"";return(!a||d>=a)&&(!b||d<=b)};
+function render(){const L=load().map((x,i)=>[x,i]).filter(([x])=>inR(x));
+$("hist").innerHTML=L.length?L.map(([x,i])=>`<div class="hi"><span onclick="openH(${i})" style="cursor:pointer">${fd(x.d.dt)} ${esc(x.d.nm||"")}</span><span>${f(x.act)} <b style="color:${Math.abs(x.diff)<.5?"var(--ok)":"var(--bad)"}">${Math.abs(x.diff)<.5?"✓":(x.diff>0?"+":"-")+Math.round(Math.abs(x.diff))}</b><span class="x" style="color:inherit" onclick="pH(${i})">🖨️</span><span class="x" onclick="del(${i})">🗑</span></span></div>`).join(""):'<div class="cs">આ તારીખોમાં કોઈ હિસાબ નથી</div>'}
+function pp(){document.body.classList.add("pp");const cl=()=>{document.body.classList.remove("pp");$("pv").innerHTML=""};window.onafterprint=cl;setTimeout(cl,120000);window.print()}
+window.pH=i=>{if((tot||act)&&!confirm("અત્યારનો હિસાબ આ સેવ કરેલા હિસાબથી બદલાઈ જશે. આગળ વધો?"))return;openH(i);dl("print")};
+function blk(x){const d=x.d,tr=a=>"<tr>"+a.map(v=>"<td>"+v+"</td>").join("")+"</tr>";
+ let tot=0;
+ const L=T.map((t,i)=>{const q=n(d["q"+i]),o=n(d["o"+i]),p=n(d["p"+i]),r=(d["r"+i]===undefined||d["r"+i]==="")?t[1]:n(d["r"+i]),c=Math.max(0,q-o-p);tot+=c*r;return[t[0],q,o,p,c,r,c*r]});
+ (x.cz||[]).filter(e=>n(e.q)).forEach(e=>{const q=n(e.q),o=n(e.o),p=n(e.p),r=n(e.r),c=Math.max(0,q-o-p);tot+=c*r;L.push([esc(e.nm||"નવી સાઈઝ"),q,o,p,c,r,c*r])});const xt=n(d.xtra);tot+=xt;
+ const oi=n(d.onl),of=n(d.of),fh=n(d.fh),kI=n(d.khIn),XS=(x.xs||[]).filter(e=>e.a);
+ const kh=kI+fh+(x.xs||[]).reduce((a,e)=>a+e.a,0),exp=tot-oi-of-kh;
+ const N=D.map(v=>[v,n(d["n"+v]),v*n(d["n"+v])]),pc=n(d.pc);
+ const act=pc+N.reduce((a,r)=>a+r[2],0),diff=act-exp;
+ const h=`<div class="db"><div class="hd"><b>તારીખ: ${fd(d.dt)}</b> &nbsp; ડીલીવરી મેન: ${esc(d.nm||"")}</div><div class="pw"><div><h2>રિફિલ</h2><table><tr><th>સાઈઝ</th><th>કુલ</th><th>ઓનલાઈન</th><th>પેટીએમ</th><th>કેશ</th><th>ભાવ</th><th>રકમ</th></tr>${L.filter(r=>r[1]).map(tr).join("")}${xt?`<tr><td>એક્સ્ટ્રા${xlab(d.xtraS,d.xtraR)?" · "+esc(xlab(d.xtraS,d.xtraR)):""}</td><td colspan="6">${f(xt)}</td></tr>`:""}<tr><th>કુલ</th><td colspan="6"><b>${f(tot)}</b></td></tr></table><table>${oi?`<tr><td>ચા</td><td>${f(oi)}</td></tr>`:""}${of?`<tr><td>ઓફિસ</td><td>${f(of)}</td></tr>`:""}${fh?`<tr><td>ફૂલ હાર</td><td>${f(fh)}</td></tr>`:""}${kI?`<tr><td>ખર્ચા</td><td>${f(kI)}</td></tr>`:""}${XS.map(e=>tr([esc(e.c)+(e.r?" · "+esc(e.r):""),f(e.a)])).join("")}<tr><td><b>કેશ મળવી જોઈએ</b></td><td><b>${f(exp)}</b></td></tr></table></div><div><h2>નોટો</h2><table>${N.filter(r=>r[1]).map(r=>tr([r[0]+" ×",r[1],f(r[2])])).join("")}${pc?`<tr><td>પરચુરણ</td><td></td><td>${f(pc)}</td></tr>`:""}<tr><td><b>ગણેલ કેશ</b></td><td></td><td><b>${f(act)}</b></td></tr></table><h2>${Math.abs(diff)<.5?"✅ હિસાબ બરાબર":(diff>0?"વધારો ":"ઘટ ")+f(Math.abs(diff))}</h2></div></div></div>`;
+ return{h,tot,act,diff,exp}}
+function pR(){const L=load().filter(inR).sort((a,b)=>(a.d.dt||"").localeCompare(b.d.dt||""));
+ if(!L.length){alert("આ તારીખોમાં કોઈ હિસાબ સેવ નથી");return}
+ const R=L.map(blk),a=$("fa").value,b=$("fb").value;
+ const sum=k=>R.reduce((t,r)=>t+r[k],0);
+ $("pv").innerHTML=`<h1>શ્રી નૃસિંહ કૃપા ગેસ એજન્સી</h1><p>હિસાબ: ${a?fd(a):"શરૂઆતથી"} થી ${b?fd(b):"આજ સુધી"} (${L.length} હિસાબ)</p>`+R.map(r=>r.h).join("")+`<div class="db"><b>કુલ ${L.length} હિસાબ:</b> રિફિલ રકમ ${f(sum("tot"))} &nbsp; | &nbsp; કેશ મળવી જોઈએ ${f(sum("exp"))} &nbsp; | &nbsp; ગણેલ કેશ ${f(sum("act"))}</div>`;
+ const pv=$("pv");pv.style.setProperty("--w","741px");pv.style.setProperty("--z",1);pp()}
+window.openH=i=>{const x=load()[i];Object.keys(x.d).forEach(k=>{if($(k))$(k).value=x.d[k]});xs=(x.xs||[]).map(e=>({...e}));if(!x.xs&&x.exps)x.exps.forEach(e=>xs.push({c:e.c,a:e.a,r:e.nt||""}));if(n(x.d.khIn))xs.push({c:"અન્ય",a:n(x.d.khIn),r:""});$("khIn").value="";$("fh").value=x.d.fh||"";$("xtra").value=x.d.xtra||"";$("xtraR").value=x.d.xtraR||"";$("xtraS").value=x.d.xtraS||"";xtT();xs=xs.filter(e=>{if(e.c==="ફૂલ હાર"){$("fh").value=n($("fh").value)+e.a;return false}return true});cz=(x.cz||[]).map(e=>({...e}));rC();rX();calc();scrollTo(0,0)};
 window.del=i=>{const h=load();if(DB&&h[i]&&h[i].id){DB.doc("hisab/"+h[i].id).delete().catch(()=>alert("કાઢી શકાયું નહીં"));return}h.splice(i,1);save(h);render()};
 $("sv").onclick=async()=>{calc();const en={d:snap(),xs:xs.map(e=>({...e})),cz:cz.map(e=>({...e})),act,diff,tot,ts:Date.now()};
  if(DB){try{await DB.doc("hisab/h"+en.ts+Math.random().toString(36).slice(2,6)).set(en)}catch(er){alert("સેવ થયું નહીં. કદાચ આ ફોનમાં સેવ કરવાની પરવાનગી નથી.");return}}else{const h=load();h.unshift(en);save(h.slice(0,120));render()}
