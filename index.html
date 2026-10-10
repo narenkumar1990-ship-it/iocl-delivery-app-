@@ -88,6 +88,8 @@ const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.val
 <button class="s" id="cl">🧹 નવો હિસાબ</button>
 <button id="da" style="background:#7048e8">📲 એપ ડાઉનલોડ (ફોનમાં રાખવા)</button>
 
+<button class="s" id="mg" style="display:none">☁️ આ ફોનનો જૂનો ડેટા ક્લાઉડમાં મોકલો</button>
+
 <div class="card" id="histcard"><h2>જૂના હિસાબ</h2><div class="ex"><input id="fa" type="date"><input id="fb" type="date"></div><div class="cs" style="text-align:left;margin-bottom:6px">તારીખથી — તારીખ સુધી (ખાલી હોય તો બધા)</div><button id="rp" style="background:#1971c2;margin-bottom:8px">🖨️ આ તારીખોની પ્રિન્ટ</button><div id="hist"></div></div>
 <div id="pv"></div>
 <div class="cs">ડેટા ફક્ત આ ફોનના બ્રાઉઝરમાં સેવ થાય છે</div>
@@ -222,6 +224,12 @@ const hs=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|
  if(!d){st.textContent="📴 ફક્ત આ ફોનમાં સેવ થાય છે (લાઈવ સિંક બંધ)";return}
  DB=d;st.textContent="🟡 સિંક જોડાઈ રહ્યું છે…";
  try{const loc=JSON.parse(localStorage.getItem("hisab")||"[]");if(loc.length&&!localStorage.getItem("migr")){for(const x of loc){await DB.doc("hisab/L"+hs(JSON.stringify(x))).set({...x,ts:x.ts||Date.parse(x.d&&x.d.dt)||0})}localStorage.setItem("migr","1")}}catch(e){}
+ try{const cur=JSON.parse(localStorage.getItem("hisab")||"[]"),bk0=JSON.parse(localStorage.getItem("hisab_bak")||"[]");if(cur.length>bk0.length)localStorage.setItem("hisab_bak",JSON.stringify(cur))}catch(e){}
+ $("mg").style.display="";$("mg").onclick=async()=>{let L=[];try{const a1=JSON.parse(localStorage.getItem("hisab_bak")||"[]"),b1=JSON.parse(localStorage.getItem("hisab")||"[]");L=a1.length>=b1.length?a1:b1}catch(e){}
+  if(!L.length){alert("આ ફોનમાં/બ્રાઉઝરમાં કોઈ જૂનો હિસાબ મળ્યો નથી");return}
+  $("mg").textContent="⏳ મોકલી રહ્યા છીએ…";
+  try{for(const x of L){const {id,...y}=x;await DB.doc("hisab/L"+hs(JSON.stringify(y))).set({...y,ts:y.ts||Date.parse(y.d&&y.d.dt)||0})}$("mg").textContent="✅ "+L.length+" હિસાબ ક્લાઉડમાં મોકલાયા"}
+  catch(e){$("mg").textContent="❌ મોકલાયું નહીં ("+((e&&e.code)||"error")+")"}};
  DB.collection("hisab").onSnapshot(sn=>{H=sn.docs.map(z=>({id:z.id,...z.data()}));H.sort((a,b)=>(b.ts||0)-(a.ts||0));H.forEach(x=>(x.xs||[]).forEach(e=>{if(e.r==="ખર્ચા")e.r=""}));try{localStorage.setItem("hisab",JSON.stringify(H))}catch(e){}st.textContent="🟢 લાઈવ સિંક ચાલુ";render()},()=>{st.textContent="🔴 સિંક બંધ (આ ફોનનો ડેટા દેખાય છે)";H=null;render()});
  DB.doc("settings/main").onSnapshot(sn=>{if(!sn.exists){if(XU.length||hid.length)pushSet();return}const v=sn.data(),nx=JSON.stringify(v.xu||[]),nh=JSON.stringify(v.hid||[]),cx=nx!==JSON.stringify(XU),ch=nh!==JSON.stringify(hid);if(cx){XU=v.xu||[];try{localStorage.setItem("xu",nx)}catch(e){}}if(ch){hid=v.hid||[];try{localStorage.setItem("hid",nh)}catch(e){}rH()}if(cx)rX()},()=>{});
  /* ===== લાઈવ ડ્રાફ્ટ સિંક: લખતા લખતા (સેવ પહેલાં) બીજા ફોનમાં દેખાય ===== */
@@ -259,4 +267,43 @@ const firebaseConfig={
 /* ====================================================== */
 const $=i=>document.getElementById(i);
 const st=$("sync");
-if(!firebaseConfig.projectId||firebaseCo
+if(!firebaseConfig.projectId||firebaseConfig.projectId==="YOUR_PROJECT_ID"){
+  st.textContent="⚙️ Firebase ની ચાવીઓ હજી ભરી નથી (ફક્ત આ ફોનમાં સેવ થાય છે)";
+  window.__resolveDb(null);
+}else{
+  try{
+    const B="https://www.gstatic.com/firebasejs/10.12.2/";
+    const {initializeApp}=await import(B+"firebase-app.js");
+    const {getAuth,onAuthStateChanged,signInAnonymously}=await import(B+"firebase-auth.js");
+    await new Promise(r=>{let ok=false;try{ok=sessionStorage.getItem("pinok")==="1"}catch(e){}if(ok)r();else window.addEventListener("pinok",r,{once:true})});
+    const F=await import(B+"firebase-firestore.js");
+    const app=initializeApp(firebaseConfig);
+    const auth=getAuth(app);
+    let fs;try{fs=F.initializeFirestore(app,{localCache:F.persistentLocalCache()})}catch(e){fs=F.getFirestore(app)}
+    const clean=d=>JSON.parse(JSON.stringify(d));
+    const adapter={
+      doc:p=>({
+        set:d=>F.setDoc(F.doc(fs,p),clean(d)),
+        delete:()=>F.deleteDoc(F.doc(fs,p)),
+        onSnapshot:(n,e)=>F.onSnapshot(F.doc(fs,p),s=>n({exists:s.exists(),data:()=>s.data()}),e)
+      }),
+      collection:p=>({
+        onSnapshot:(n,e)=>F.onSnapshot(F.collection(fs,p),s=>n({docs:s.docs.map(d=>({id:d.id,exists:true,data:()=>d.data()}))}),e)
+      })
+    };
+    let started=false;
+    onAuthStateChanged(auth,async u=>{
+      if(u){if(!started){started=true;window.__resolveDb(adapter)}}
+      else{
+        try{await signInAnonymously(auth)}
+        catch(e){console.error(e);st.textContent="🔴 લૉગિન ચાલુ નથી: Firebase માં Authentication → Sign-in method → Anonymous ચાલુ કરો";window.__resolveDb(null)}
+      }
+    });
+  }catch(e){
+    console.error(e);
+    st.textContent="🔴 Firebase જોડાઈ શક્યું નહીં (ઇન્ટરનેટ કે ચાવીઓ તપાસો). ફક્ત આ ફોનમાં સેવ થાય છે";
+    window.__resolveDb(null);
+  }
+}
+</script>
+</body></html>
