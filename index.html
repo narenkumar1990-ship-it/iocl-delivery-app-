@@ -56,7 +56,7 @@ window.claude={use:n=>n==="db"?window.__dbP:Promise.resolve(null)};
 const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.value.length>=4){if(h(i.value)===OK){try{sessionStorage.setItem("pinok","1")}catch(e){}p.style.display="none";i.value="";document.getElementById("pine").textContent="";window.dispatchEvent(new Event("pinok"))}else{document.getElementById("pine").textContent="પિન ખોટો છે";i.value=""}}});setTimeout(()=>i.focus(),50)})();</script>
 
 
-<h1>⛽ રિફિલ હિસાબ <small style="font-size:11px;color:var(--m);font-weight:400">v5 લાઈવ</small></h1>
+<h1>⛽ રિફિલ હિસાબ <small style="font-size:11px;color:var(--m);font-weight:400">v10 લાઈવ</small></h1>
 <div id="sync" style="position:sticky;top:0;z-index:50;background:var(--c);border:1px solid var(--b);border-radius:8px;padding:8px 10px;font-size:14px;font-weight:600;line-height:1.35;margin:0 0 8px">⏳ પિન નાખો, પછી સિંક જોડાશે…</div>
 
 <div class="card"><div class="r"><input class="l" id="dt" type="date" style="width:48%"><input class="l" id="nm" value="KALALI GODOWN" placeholder="ડીલીવરી મેનનું નામ" style="width:48%"></div></div>
@@ -88,12 +88,19 @@ const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.val
 <button class="s" id="cl">🧹 નવો હિસાબ</button>
 <button id="da" style="background:#7048e8">📲 એપ ડાઉનલોડ (ફોનમાં રાખવા)</button>
 
-<button class="s" id="dd" style="display:none"></button>
 <button class="s" id="mg" style="display:none">☁️ આ ફોનનો જૂનો ડેટા ક્લાઉડમાં મોકલો</button>
 
 <div class="card" id="histcard"><h2>જૂના હિસાબ</h2><div class="ex"><input id="fa" type="date"><input id="fb" type="date"></div><div class="cs" style="text-align:left;margin-bottom:6px">તારીખથી — તારીખ સુધી (ખાલી હોય તો બધા)</div><button id="rp" style="background:#1971c2;margin-bottom:8px">🖨️ આ તારીખોની પ્રિન્ટ</button><div id="hist"></div></div>
+<div class="card np" id="bkcard"><h2>બેકઅપ / ક્લીનઅપ</h2>
+<button id="bk" style="background:#2b8a3e">💾 બેકઅપ ડાઉનલોડ (બધા હિસાબ)</button>
+<button id="im" class="s">📥 બેકઅપ ઇમ્પોર્ટ</button>
+<input id="imf" type="file" accept=".json,application/json" style="display:none">
+<button id="ex" class="s">📊 બધા હિસાબ Excel માં (CSV)</button>
+<button id="dd" class="s">🧹 ડુપ્લિકેટ સાફ કરો</button>
+<button id="wp" class="s" style="color:var(--bad)">🗑 બધો ડેટા ભૂંસો (ક્લાઉડ સહિત)</button>
+<div class="cs" style="margin-top:6px">બેકઅપ ફાઇલ સાચવી રાખો. ઇમ્પોર્ટ કરતાં એક તારીખનો એક જ હિસાબ રહેશે.</div></div>
 <div id="pv"></div>
-<div class="cs">ડેટા ફક્ત આ ફોનના બ્રાઉઝરમાં સેવ થાય છે</div>
+<div class="cs">ડેટા ક્લાઉડમાં સેવ થાય છે (🟢 લાઈવ સિંક ચાલુ હોય ત્યારે). બેકઅપ લેતા રહો.</div>
 
 <script>
 const T=[["૧૦ કિલો",677],["૧૪.૨ કિલો",948],["૧૯ કિલો",2807],["૫ કિલો",780]];
@@ -107,7 +114,7 @@ let rows="";T.forEach((t,i)=>{rows+=`<div class="g"><span style="font-size:12px"
 $("rows").innerHTML=rows;
 $("notes").innerHTML=D.map(d=>`<div class="r"><span>${d} ×</span><input type="number" inputmode="numeric" id="n${d}"><span id="s${d}" style="width:70px;text-align:right">0</span></div>`).join("");
 $("dt").valueAsDate=new Date();
-const ids=()=>[...document.querySelectorAll("input")].map(e=>e.id).filter(i=>i&&!["ea","en","fa","fb"].includes(i));
+const ids=()=>[...document.querySelectorAll("input")].map(e=>e.id).filter(i=>i&&!["ea","en","fa","fb","imf"].includes(i));
 function calc(){
  tot=0;
  T.forEach((t,i)=>{const q=n($("q"+i).value),c=Math.max(0,q-n($("o"+i).value)-n($("p"+i).value)),r=n($("r"+i).value),a=c*r;tot+=a;$("c"+i).textContent=q?`કેશ ${c} × ${r} = ${f(a)}`:""});
@@ -159,85 +166,7 @@ let H=null,DB=null;
 function load(){if(H)return H;try{const h=JSON.parse(localStorage.getItem("hisab")||"[]");h.forEach(x=>(x.xs||[]).forEach(e=>{if(e.r==="ખર્ચા")e.r=""}));return h}catch(e){return[]}}
 function save(a){try{localStorage.setItem("hisab",JSON.stringify(a))}catch(e){}}
 function snap(){const o={};ids().forEach(i=>o[i]=$(i).value);o.xtraS=$("xtraS").value;return o}
-const sm=x=>{const kh=n(x.d.khIn)+n(x.d.fh)+(x.xs||[]).reduce((a,e)=>a+e.a,0);return{kh,exp:x.tot-n(x.d.onl)-kh-n(x.d.of)}};
-const inR=x=>{const a=$("fa").value,b=$("fb").value,d=x.d.dt||"";return(!a||d>=a)&&(!b||d<=b)};
-function render(){const L=load().map((x,i)=>[x,i]).filter(([x])=>inR(x));
-$("hist").innerHTML=L.length?L.map(([x,i])=>`<div class="hi"><span onclick="openH(${i})" style="cursor:pointer">${fd(x.d.dt)} ${esc(x.d.nm||"")}</span><span>${f(x.act)} <b style="color:${Math.abs(x.diff)<.5?"var(--ok)":"var(--bad)"}">${Math.abs(x.diff)<.5?"✓":(x.diff>0?"+":"-")+Math.round(Math.abs(x.diff))}</b><span class="x" style="color:inherit" onclick="pH(${i})">🖨️</span><span class="x" onclick="del(${i})">🗑</span></span></div>`).join(""):'<div class="cs">આ તારીખોમાં કોઈ હિસાબ નથી</div>'}
-function pp(){document.body.classList.add("pp");const cl=()=>{document.body.classList.remove("pp");$("pv").innerHTML=""};window.onafterprint=cl;setTimeout(cl,120000);window.print()}
-window.pH=i=>{if((tot||act)&&!confirm("અત્યારનો હિસાબ આ સેવ કરેલા હિસાબથી બદલાઈ જશે. આગળ વધો?"))return;openH(i);dl("print")};
-function blk(x){const d=x.d,tr=a=>"<tr>"+a.map(v=>"<td>"+v+"</td>").join("")+"</tr>";
- let tot=0;
- const L=T.map((t,i)=>{const q=n(d["q"+i]),o=n(d["o"+i]),p=n(d["p"+i]),r=(d["r"+i]===undefined||d["r"+i]==="")?t[1]:n(d["r"+i]),c=Math.max(0,q-o-p);tot+=c*r;return[t[0],q,o,p,c,r,c*r]});
- (x.cz||[]).filter(e=>n(e.q)).forEach(e=>{const q=n(e.q),o=n(e.o),p=n(e.p),r=n(e.r),c=Math.max(0,q-o-p);tot+=c*r;L.push([esc(e.nm||"નવી સાઈઝ"),q,o,p,c,r,c*r])});const xt=n(d.xtra);tot+=xt;
- const oi=n(d.onl),of=n(d.of),fh=n(d.fh),kI=n(d.khIn),XS=(x.xs||[]).filter(e=>e.a);
- const kh=kI+fh+(x.xs||[]).reduce((a,e)=>a+e.a,0),exp=tot-oi-of-kh;
- const N=D.map(v=>[v,n(d["n"+v]),v*n(d["n"+v])]),pc=n(d.pc);
- const act=pc+N.reduce((a,r)=>a+r[2],0),diff=act-exp;
- const h=`<div class="db"><div class="hd"><b>તારીખ: ${fd(d.dt)}</b> &nbsp; ડીલીવરી મેન: ${esc(d.nm||"")}</div><div class="pw"><div><h2>રિફિલ</h2><table><tr><th>સાઈઝ</th><th>કુલ</th><th>ઓનલાઈન</th><th>પેટીએમ</th><th>કેશ</th><th>ભાવ</th><th>રકમ</th></tr>${L.filter(r=>r[1]).map(tr).join("")}${xt?`<tr><td>એક્સ્ટ્રા${xlab(d.xtraS,d.xtraR)?" · "+esc(xlab(d.xtraS,d.xtraR)):""}</td><td colspan="6">${f(xt)}</td></tr>`:""}<tr><th>કુલ</th><td colspan="6"><b>${f(tot)}</b></td></tr></table><table>${oi?`<tr><td>ચા</td><td>${f(oi)}</td></tr>`:""}${of?`<tr><td>ઓફિસ</td><td>${f(of)}</td></tr>`:""}${fh?`<tr><td>ફૂલ હાર</td><td>${f(fh)}</td></tr>`:""}${kI?`<tr><td>ખર્ચા</td><td>${f(kI)}</td></tr>`:""}${XS.map(e=>tr([esc(e.c)+(e.r?" · "+esc(e.r):""),f(e.a)])).join("")}<tr><td><b>કેશ મળવી જોઈએ</b></td><td><b>${f(exp)}</b></td></tr></table></div><div><h2>નોટો</h2><table>${N.filter(r=>r[1]).map(r=>tr([r[0]+" ×",r[1],f(r[2])])).join("")}${pc?`<tr><td>પરચુરણ</td><td></td><td>${f(pc)}</td></tr>`:""}<tr><td><b>ગણેલ કેશ</b></td><td></td><td><b>${f(act)}</b></td></tr></table><h2>${Math.abs(diff)<.5?"✅ હિસાબ બરાબર":(diff>0?"વધારો ":"ઘટ ")+f(Math.abs(diff))}</h2></div></div></div>`;
- return{h,tot,act,diff,exp}}
-function pR(){const L=load().filter(inR).sort((a,b)=>(a.d.dt||"").localeCompare(b.d.dt||""));
- if(!L.length){alert("આ તારીખોમાં કોઈ હિસાબ સેવ નથી");return}
- const R=L.map(blk),a=$("fa").value,b=$("fb").value;
- const sum=k=>R.reduce((t,r)=>t+r[k],0);
- $("pv").innerHTML=`<h1>શ્રી નૃસિંહ કૃપા ગેસ એજન્સી</h1><p>હિસાબ: ${a?fd(a):"શરૂઆતથી"} થી ${b?fd(b):"આજ સુધી"} (${L.length} હિસાબ)</p>`+R.map(r=>r.h).join("")+`<div class="db"><b>કુલ ${L.length} હિસાબ:</b> રિફિલ રકમ ${f(sum("tot"))} &nbsp; | &nbsp; કેશ મળવી જોઈએ ${f(sum("exp"))} &nbsp; | &nbsp; ગણેલ કેશ ${f(sum("act"))}</div>`;
- const pv=$("pv");pv.style.setProperty("--w","741px");pv.style.setProperty("--z",1);pp()}
-window.openH=i=>{const x=load()[i];Object.keys(x.d).forEach(k=>{if($(k))$(k).value=x.d[k]});xs=(x.xs||[]).map(e=>({...e}));if(!x.xs&&x.exps)x.exps.forEach(e=>xs.push({c:e.c,a:e.a,r:e.nt||""}));if(n(x.d.khIn))xs.push({c:"અન્ય",a:n(x.d.khIn),r:""});$("khIn").value="";$("fh").value=x.d.fh||"";$("xtra").value=x.d.xtra||"";$("xtraR").value=x.d.xtraR||"";$("xtraS").value=x.d.xtraS||"";xtT();xs=xs.filter(e=>{if(e.c==="ફૂલ હાર"){$("fh").value=n($("fh").value)+e.a;return false}return true});cz=(x.cz||[]).map(e=>({...e}));rC();rX();calc();scrollTo(0,0)};
-window.del=i=>{const h=load();if(DB&&h[i]&&h[i].id){DB.doc("hisab/"+h[i].id).delete().catch(()=>alert("કાઢી શકાયું>${t[0]}</span><input type="number" inputmode="numeric" id="q${i}"><input type="number" inputmode="numeric" id="o${i}"><input type="number" inputmode="numeric" id="p${i}"><input type="number" inputmode="numeric" id="r${i}" value="${t[1]}"></div><div class="cs" id="c${i}" style="text-align:right;margin:-2px 0 6px"></div>`});
-$("rows").innerHTML=rows;
-$("notes").innerHTML=D.map(d=>`<div class="r"><span>${d} ×</span><input type="number" inputmode="numeric" id="n${d}"><span id="s${d}" style="width:70px;text-align:right">0</span></div>`).join("");
-$("dt").valueAsDate=new Date();
-const ids=()=>[...document.querySelectorAll("input")].map(e=>e.id).filter(i=>i&&!["ea","en","fa","fb"].includes(i));
-function calc(){
- tot=0;
- T.forEach((t,i)=>{const q=n($("q"+i).value),c=Math.max(0,q-n($("o"+i).value)-n($("p"+i).value)),r=n($("r"+i).value),a=c*r;tot+=a;$("c"+i).textContent=q?`કેશ ${c} × ${r} = ${f(a)}`:""});
- cz.forEach((e,i)=>{const c=Math.max(0,n(e.q)-n(e.o)-n(e.p)),a=c*n(e.r);tot+=a;const el=$("cc"+i);if(el)el.textContent=n(e.q)?`કેશ ${c} × ${n(e.r)} = ${f(a)}`:""});
- tot+=n($("xtra").value);
- kh=xs.reduce((a,e)=>a+e.a,0);
- $("xp").innerHTML=xs.filter(e=>e.a).map(e=>`<div class="r"><span>${esc(e.c)}${e.r?" · "+esc(e.r):""}</span><span>${f(e.a)}</span></div>`).join("");
- exp=tot-n($("onl").value)-kh-n($("of").value)-n($("fh").value);
- act=n($("pc").value);D.forEach(d=>{const s=d*n($("n"+d).value);$("s"+d).textContent=s;act+=s});
- diff=act-exp;
- $("tot").textContent=f(tot);$("exp").textContent=f(exp);$("act").textContent=f(act);
- const b=$("diff");
- if(!act&&!tot){b.textContent="";b.style.background="none";return}
- if(Math.abs(diff)<0.5){b.textContent="✅ હિસાબ બરાબર";b.style.background="rgba(43,138,62,.15)";b.style.color="var(--ok)"}
- else{b.textContent=(diff>0?"વધારો ":"ઘટ ")+f(Math.abs(diff));b.style.background="rgba(201,42,42,.12)";b.style.color="var(--bad)"}
-}
-const XC=["સરના કહેવાથી","ડિસ્કાઉન્ટ","પાણી ના જગ","ઉપાડ","જય રણછોડ","આદર્શ નિવાસી ચેક પેમેન્ટ","બાલ વિકાસ યોજના","ડીઝલ / પેટ્રોલ","ચા-નાસ્તો","રિપેરીંગ","પગાર","અન્ય"];
-const RM=["સરના કહેવાથી","બાલ વિકાસ યોજના","ડિસ્કાઉન્ટ","ઉપાડ","અન્ય"];
-let XU=[];try{XU=JSON.parse(localStorage.getItem("xu")||"[]")}catch(e){}
-const sXU=()=>{try{localStorage.setItem("xu",JSON.stringify(XU))}catch(e){}pushSet()};
-function pushSet(){if(DB)DB.doc("settings/main").set({xu:XU,hid:hid}).catch(()=>{})}
-const XL=()=>{const b=XC.filter(c=>c!=="અન્ય");return b.concat(XU,["અન્ય"])};
-function OP(cur){const L=XL();if(cur&&!L.includes(cur))L.unshift(cur);
- return L.map(c=>`<option${c===cur?" selected":""}>${esc(c)}</option>`).join("")+'<option value="__add">➕ નવો પ્રકાર ઉમેરો</option>'+(XU.length?'<option value="__del">🗑 ઉમેરેલો પ્રકાર કાઢો</option>':"")}
-window.xsel=(i,v)=>{
- if(v==="__add"){const nm=(prompt("નવા ખર્ચાનું નામ લખો (કાયમી રહેશે)")||"").trim();if(nm){if(!XL().includes(nm)){XU.push(nm);sXU()}xs[i].c=nm}}
- else if(v==="__del"){const t=(prompt("કાઢવા માટે નંબર લખો:\n"+XU.map((x,k)=>(k+1)+". "+x).join("\n"))||"").trim(),k=parseInt(t)-1;if(XU[k]){XU.splice(k,1);sXU()}}
- else xs[i].c=v;
- rX();calc()};
-
-function rX(){$("xl").innerHTML=xs.map((e,i)=>`<div class="xw"><div class="xr"><select onchange="xsel(${i},this.value)">${OP(e.c)}</select><input type="number" inputmode="numeric" placeholder="રકમ ₹" value="${e.a||""}" oninput="xs[${i}].a=n(this.value);calc()"><span class="x" onclick="xd(${i})">✕</span></div>${RM.includes(e.c)?`<input class="l" style="margin-bottom:6px" placeholder="${e.c==="બાલ વિકાસ યોજના"?"ગ્રાહક નંબર લખો":"રિમાર્ક / નોંધ લખો"}" value="${esc(e.r||"").replace(/"/g,"&quot;")}" oninput="xs[${i}].r=this.value">`:""}</div>`).join("")}
-window.xd=i=>{xs.splice(i,1);rX();calc()};
-$("xa").onclick=()=>{xs.push({c:XC[0],a:0});rX()};
-rX();
-const HN={onl:"ચા",of:"ઓફિસ",fh:"ફૂલ હાર"};let hid=[];try{hid=JSON.parse(localStorage.getItem("hid")||"[]")}catch(e){}
-const sHid=()=>{try{localStorage.setItem("hid",JSON.stringify(hid))}catch(e){}pushSet()};
-function rH(){Object.keys(HN).forEach(k=>$("rw_"+k).style.display=hid.includes(k)?"none":"");$("rb").innerHTML=hid.map(k=>`<button class="s" style="width:auto;padding:6px 12px;margin:0 0 6px" onclick="sh('${k}')">➕ ${HN[k]}</button>`).join("")}
-window.hd=k=>{$(k).value="";if(!hid.includes(k))hid.push(k);sHid();rH();calc()};
-window.sh=k=>{hid=hid.filter(x=>x!==k);sHid();rH()};
-rH();
-function rC(){$("cz").innerHTML=cz.map((e,i)=>`<div class="g"><input class="l" style="font-size:12px;padding:9px 4px" placeholder="સાઈઝ" value="${esc(e.nm||"").replace(/"/g,"&quot;")}" oninput="cz[${i}].nm=this.value">${["q","o","p","r"].map(k=>`<input type="number" inputmode="numeric" value="${e[k]||""}" oninput="cz[${i}].${k}=this.value;calc()">`).join("")}</div><div class="cs" style="text-align:right;margin:-2px 0 6px"><span id="cc${i}"></span> <span class="x" onclick="cd(${i})">✕ કાઢો</span></div>`).join("")}
-const xlab=(S,R)=>{const a=[];if(S)a.push(S);if((S==="અન્ય"||!S)&&R)a.push(R);return a.join(" · ")};
-const xtT=()=>{$("xtraR").style.display=$("xtraS").value==="અન્ય"?"block":"none"};
-$("xtraS").addEventListener("change",xtT);
-window.cd=i=>{cz.splice(i,1);rC();calc()};
-$("ca").onclick=()=>{cz.push({nm:"",q:"",o:"",p:"",r:""});rC();calc()};
-document.addEventListener("input",calc);
-let H=null,DB=null;
-function load(){if(H)return H;try{const h=JSON.parse(localStorage.getItem("hisab")||"[]");h.forEach(x=>(x.xs||[]).forEach(e=>{if(e.r==="ખર્ચા")e.r=""}));return h}catch(e){return[]}}
-function save(a){try{localStorage.setItem("hisab",JSON.stringify(a))}catch(e){}}
-function snap(){const o={};ids().forEach(i=>o[i]=$(i).value);o.xtraS=$("xtraS").value;return o}
+const dkey=x=>((x.d&&x.d.dt)||"")+"|"+((x.d&&x.d.nm)||"").trim().toLowerCase();
 const sm=x=>{const kh=n(x.d.khIn)+n(x.d.fh)+(x.xs||[]).reduce((a,e)=>a+e.a,0);return{kh,exp:x.tot-n(x.d.onl)-kh-n(x.d.of)}};
 const inR=x=>{const a=$("fa").value,b=$("fb").value,d=x.d.dt||"";return(!a||d>=a)&&(!b||d<=b)};
 function render(){const L=load().map((x,i)=>[x,i]).filter(([x])=>inR(x));
@@ -263,7 +192,10 @@ function pR(){const L=load().filter(inR).sort((a,b)=>(a.d.dt||"").localeCompare(
 window.openH=i=>{const x=load()[i];Object.keys(x.d).forEach(k=>{if($(k))$(k).value=x.d[k]});xs=(x.xs||[]).map(e=>({...e}));if(!x.xs&&x.exps)x.exps.forEach(e=>xs.push({c:e.c,a:e.a,r:e.nt||""}));if(n(x.d.khIn))xs.push({c:"અન્ય",a:n(x.d.khIn),r:""});$("khIn").value="";$("fh").value=x.d.fh||"";$("xtra").value=x.d.xtra||"";$("xtraR").value=x.d.xtraR||"";$("xtraS").value=x.d.xtraS||"";xtT();xs=xs.filter(e=>{if(e.c==="ફૂલ હાર"){$("fh").value=n($("fh").value)+e.a;return false}return true});cz=(x.cz||[]).map(e=>({...e}));rC();rX();calc();scrollTo(0,0)};
 window.del=i=>{const h=load();if(DB&&h[i]&&h[i].id){DB.doc("hisab/"+h[i].id).delete().catch(()=>alert("કાઢી શકાયું નહીં"));return}h.splice(i,1);save(h);render()};
 $("sv").onclick=async()=>{calc();const en={d:snap(),xs:xs.map(e=>({...e})),cz:cz.map(e=>({...e})),act,diff,tot,ts:Date.now()};
- if(DB){try{await DB.doc("hisab/h"+en.ts+Math.random().toString(36).slice(2,6)).set(en)}catch(er){alert("સેવ થયું નહીં. કદાચ આ ફોનમાં સેવ કરવાની પરવાનગી નથી.");return}}else{const h=load();h.unshift(en);save(h.slice(0,120));render()}
+ const ex=load().filter(x=>dkey(x)===dkey(en));
+ if(ex.length&&!confirm("⚠️ "+fd(en.d.dt)+" નો હિસાબ પહેલેથી સેવ છે.\nનવા હિસાબથી જૂનો બદલવો છે?\n\nOK = બદલો   |   Cancel = રહેવા દો"))return;
+ const nid="D"+hs(dkey(en));
+ if(DB){try{await DB.doc("hisab/"+nid).set(en);for(const x of ex){if(x.id&&x.id!==nid)await DB.doc("hisab/"+x.id).delete()}}catch(er){alert("સેવ થયું નહીં ("+((er&&er.code)||"error")+")");return}}else{const h=load().filter(x=>dkey(x)!==dkey(en));h.unshift(en);save(h.slice(0,120));render()}
  $("sv").textContent="✅ સેવ થયું";setTimeout(()=>$("sv").textContent="💾 સેવ કરો",1500)};
 $("cl").onclick=()=>{ids().forEach(i=>{if(!i.startsWith("r")&&i!=="dt"&&i!=="nm")$(i).value=""});xs=[];rX();cz=[];rC();$("nm").value="KALALI GODOWN";$("xtraS").value="";xtT();calc()};
 async function dl(kind){
@@ -299,22 +231,65 @@ $("da").onclick=dapp;
 $("pr").onclick=()=>dl("print");
 $("rp").onclick=pR;["fa","fb"].forEach(i=>$(i).addEventListener("change",render));
 const hs=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return(h>>>0).toString(36)};
+const dlf=(name,data,type)=>{const u=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)};
+const tdy=()=>new Date().toLocaleDateString("en-CA");
+$("bk").onclick=()=>{const L=load().map(x=>{const {id,...y}=x;return y});if(!L.length){alert("બેકઅપ માટે કોઈ હિસાબ નથી");return}
+ dlf("hisab-backup-"+tdy()+".json",JSON.stringify({app:"refill-hisab",v:1,at:new Date().toISOString(),hisab:L,xu:XU}),"application/json")};
+$("ex").onclick=()=>{const L=load().slice().sort((a,b)=>(a.d.dt||"").localeCompare(b.d.dt||""));if(!L.length){alert("કોઈ હિસાબ નથી");return}
+ let s="\ufeffતારીખ,નામ,કુલ રકમ,કેશ મળવી જોઈએ,ગણેલ કેશ,ફરક\n";
+ L.forEach(x=>{const b=blk(x);s+=[fd(x.d.dt),'"'+(x.d.nm||"").replace(/"/g,'""')+'"',Math.round(b.tot),Math.round(b.exp),Math.round(b.act),Math.round(b.diff)].join(",")+"\n"});
+ dlf("hisab-all-"+tdy()+".csv",s,"text/csv;charset=utf-8")};
+$("im").onclick=()=>$("imf").click();
+$("wp").onclick=async()=>{const L=load();if(!L.length){alert("ભૂંસવા માટે કોઈ હિસાબ નથી");return}
+ if(!confirm("⚠️ બધા "+L.length+" હિસાબ ભૂંસાઈ જશે"+(DB?" (ક્લાઉડમાંથી, બધા ફોન/PC પરથી)":"")+".\n\nપહેલા બેકઅપ ફાઇલ ડાઉનલોડ થશે. આગળ વધવું છે?"))return;
+ const w=prompt("ખાતરી માટે નીચે  DELETE  લખો");if((w||"").trim().toUpperCase()!=="DELETE"){alert("રદ કર્યું. કંઈ ભૂંસાયું નથી");return}
+ $("bk").onclick();await new Promise(r=>setTimeout(r,800));
+ try{if(DB){for(const x of L){if(x.id)await DB.doc("hisab/"+x.id).delete()}}
+  try{localStorage.setItem("hisab","[]");localStorage.removeItem("hisab_bak")}catch(e){}
+  if(!DB)render();$("wp").textContent="✅ બધું ભૂંસાયું (બેકઅપ ડાઉનલોડ થયું)"}
+ catch(e){alert("ભૂંસાયું નહીં ("+((e&&e.code)||"error")+")")}
+ setTimeout(()=>$("wp").textContent="🗑 બધો ડેટા ભૂંસો (ક્લાઉડ સહિત)",4000)};
+$("imf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+ let j;try{j=JSON.parse(await f.text())}catch(er){alert("ફાઇલ વંચાઈ નહીં. બેકઅપ (.json) ફાઇલ પસંદ કરો");return}
+ const A=(j&&Array.isArray(j.hisab)?j.hisab:Array.isArray(j)?j:[]).filter(x=>x&&x.d&&typeof x.d==="object");
+ if(!A.length){alert("આ ફાઇલમાં કોઈ હિસાબ મળ્યો નથી");return}
+ const has={};load().forEach(x=>{(has[dkey(x)]=has[dkey(x)]||[]).push(x)});
+ const conf=A.filter(x=>has[dkey(x)]).length;let rp=false;
+ if(conf)rp=confirm("ફાઇલમાં "+A.length+" હિસાબ છે. તેમાંથી "+conf+" ની તારીખ પહેલેથી સેવ છે.\n\nOK = તે તારીખો બદલો (ફાઇલનો હિસાબ રાખો)\nCancel = તે તારીખો છોડી દો (ફક્ત નવા ઉમેરો)");
+ const todo=A.filter(x=>rp||!has[dkey(x)]);
+ if(!todo.length){alert("કોઈ નવો હિસાબ ઉમેરવાનો નથી");return}
+ const bt=$("im");bt.textContent="⏳ ઇમ્પોર્ટ ચાલુ…";
+ try{
+  if(DB){for(const x0 of todo){const {id,...x}=x0;const nid="D"+hs(dkey(x));await DB.doc("hisab/"+nid).set({...x,ts:x.ts||Date.parse(x.d.dt)||Date.now()});for(const o of (has[dkey(x)]||[]))if(o.id&&o.id!==nid)await DB.doc("hisab/"+o.id).delete()}}
+  else{const h=load().filter(x=>!todo.some(t=>dkey(t)===dkey(x)));todo.forEach(x0=>{const {id,...x}=x0;h.push(x)});h.sort((a,b)=>(b.ts||0)-(a.ts||0));save(h);render()}
+  if(Array.isArray(j.xu)){let ch=false;j.xu.forEach(n=>{if(typeof n==="string"&&n&&!XL().includes(n)){XU.push(n);ch=true}});if(ch)sXU()}
+  bt.textContent="✅ "+todo.length+" હિસાબ ઇમ્પોર્ટ થયા";
+ }catch(er){bt.textContent="❌ ઇમ્પોર્ટ ન થયું ("+((er&&er.code)||"error")+")"}
+ setTimeout(()=>bt.textContent="📥 બેકઅપ ઇમ્પોર્ટ",4000)};
 (async()=>{let d=null;try{d=await claude.use("db")}catch(e){}
  const st=$("sync");
  if(!d){st.textContent=window.__dbErr||"📴 ફક્ત આ ફોનમાં સેવ થાય છે (લાઈવ સિંક બંધ)";return}
  DB=d;st.textContent="🟡 સિંક જોડાઈ રહ્યું છે…";
- try{const loc=JSON.parse(localStorage.getItem("hisab")||"[]");if(loc.length&&!localStorage.getItem("migr")){for(const x0 of loc){const {id:_i,...x}=x0;await DB.doc("hisab/L"+hs(JSON.stringify(x))).set({...x,ts:x.ts||Date.parse(x.d&&x.d.dt)||0})}localStorage.setItem("migr","1")}}catch(e){}
+ 
  try{const cur=JSON.parse(localStorage.getItem("hisab")||"[]"),bk0=JSON.parse(localStorage.getItem("hisab_bak")||"[]");if(cur.length>bk0.length)localStorage.setItem("hisab_bak",JSON.stringify(cur))}catch(e){}
  $("mg").style.display="";$("mg").onclick=async()=>{let L=[];try{const a1=JSON.parse(localStorage.getItem("hisab_bak")||"[]"),b1=JSON.parse(localStorage.getItem("hisab")||"[]");L=a1.length>=b1.length?a1:b1}catch(e){}
   if(!L.length){alert("આ ફોનમાં/બ્રાઉઝરમાં કોઈ જૂનો હિસાબ મળ્યો નથી");return}
   $("mg").textContent="⏳ મોકલી રહ્યા છીએ…";
-  try{for(const x of L){const {id,...y}=x;await DB.doc("hisab/L"+hs(JSON.stringify(y))).set({...y,ts:y.ts||Date.parse(y.d&&y.d.dt)||0})}$("mg").textContent="✅ "+L.length+" હિસાબ ક્લાઉડમાં મોકલાયા"}
+  try{const have=new Set((H||[]).map(dkey));let c=0;for(const x of L){const {id,...y}=x;if(have.has(dkey(y)))continue;have.add(dkey(y));c++;await DB.doc("hisab/D"+hs(dkey(y))).set({...y,ts:y.ts||Date.parse(y.d&&y.d.dt)||0})}$("mg").textContent="✅ "+c+" નવા હિસાબ મોકલાયા (બાકીના પહેલેથી ક્લાઉડમાં છે)"}
   catch(e){$("mg").textContent="❌ મોકલાયું નહીં ("+((e&&e.code)||"error")+")"}};
  const dk=x=>JSON.stringify({d:x.d,xs:x.xs,cz:x.cz,act:x.act,diff:x.diff,tot:x.tot});
- const dups=()=>{const seen={},out=[];(H||[]).slice().sort((a,b)=>((a.id||"")[0]==="h"?0:1)-((b.id||"")[0]==="h"?0:1)).forEach(x=>{const k=dk(x);if(seen[k])out.push(x);else seen[k]=1});return out};
- const chkDup=()=>{const n=dups().length,b=$("dd");b.style.display=n?"":"none";b.textContent="🧹 "+n+" ડુપ્લિકેટ હિસાબ હટાવો"};
- $("dd").onclick=async()=>{const L=dups();if(!L.length)return;if(!confirm(L.length+" સરખા (ડુપ્લિકેટ) હિસાબ હટાવવા છે? દરેક હિસાબની એક નકલ રહેશે."))return;try{for(const x of L)await DB.doc("hisab/"+x.id).delete()}catch(e){alert("હટાવાયું નહીં ("+((e&&e.code)||"error")+")")}};
- DB.collection("hisab").onSnapshot(sn=>{H=sn.docs.map(z=>({...z.data(),id:z.id}));H.sort((a,b)=>(b.ts||0)-(a.ts||0));H.forEach(x=>(x.xs||[]).forEach(e=>{if(e.r==="ખર્ચા")e.r=""}));try{localStorage.setItem("hisab",JSON.stringify(H))}catch(e){}st.textContent="🟢 લાઈવ સિંક ચાલુ · ક્લાઉડમાં "+H.length+" હિસાબ";render();chkDup()},er=>{st.textContent="🔴 ડેટાબેઝ વાંચી શકાયો નહીં ("+((er&&er.code)||"error")+") — Firebase Rules તપાસો";H=null;render()});
+ const better=(a,b)=>{const ta=a.ts||0,tb=b.ts||0;if(ta!==tb)return ta>tb;const da=(a.id||"")[0]==="D",db=(b.id||"")[0]==="D";if(da!==db)return da;return (a.id||"")<(b.id||"")};
+ const dups=()=>{const best={},out=[];(H||[]).forEach(x=>{const k=dkey(x);if(!best[k]||better(x,best[k]))best[k]=x});(H||[]).forEach(x=>{if(best[dkey(x)]!==x)out.push(x)});return out};
+ const autoClean=()=>{dups().forEach(x=>{if(x.id)DB.doc("hisab/"+x.id).delete().catch(()=>{})})};
+ let pushed=false;
+ const autoPush=async()=>{if(pushed)return;pushed=true;try{if(localStorage.getItem("migr2")||localStorage.getItem("migr"))return;
+  const a1=JSON.parse(localStorage.getItem("hisab_bak")||"[]"),b1=JSON.parse(localStorage.getItem("hisab")||"[]"),L=a1.length>=b1.length?a1:b1;
+  const have=new Set((H||[]).map(dkey));
+  for(const x of L){const {id,...y}=x;if(!y.d||have.has(dkey(y)))continue;have.add(dkey(y));await DB.doc("hisab/D"+hs(dkey(y))).set({...y,ts:y.ts||Date.parse(y.d.dt)||0})}
+  localStorage.setItem("migr2","1")}catch(e){}};
+ const chkDup=()=>{const n=dups().length;$("dd").textContent="🧹 ડુપ્લિકેટ સાફ કરો ("+n+" મળ્યા)"};
+ $("dd").onclick=async()=>{const L=dups();if(!L.length){alert("કોઈ ડુપ્લિકેટ નથી ✅");return}if(!confirm(L.length+" ડુપ્લિકેટ હિસાબ (એક જ તારીખના) હટાવવા છે?\nદરેક તારીખનો સૌથી નવો હિસાબ રહેશે."))return;try{for(const x of L)await DB.doc("hisab/"+x.id).delete()}catch(e){alert("હટાવાયું નહીં ("+((e&&e.code)||"error")+")")}};
+ DB.collection("hisab").onSnapshot(sn=>{H=sn.docs.map(z=>({...z.data(),id:z.id}));H.sort((a,b)=>(b.ts||0)-(a.ts||0));H.forEach(x=>(x.xs||[]).forEach(e=>{if(e.r==="ખર્ચા")e.r=""}));try{localStorage.setItem("hisab",JSON.stringify(H))}catch(e){}st.textContent="🟢 લાઈવ સિંક ચાલુ · ક્લાઉડમાં "+H.length+" હિસાબ";render();chkDup();autoClean();autoPush()},er=>{st.textContent="🔴 ડેટાબેઝ વાંચી શકાયો નહીં ("+((er&&er.code)||"error")+") — Firebase Rules તપાસો";H=null;render()});
  DB.doc("settings/main").onSnapshot(sn=>{if(!sn.exists){if(XU.length||hid.length)pushSet();return}const v=sn.data(),nx=JSON.stringify(v.xu||[]),nh=JSON.stringify(v.hid||[]),cx=nx!==JSON.stringify(XU),ch=nh!==JSON.stringify(hid);if(cx){XU=v.xu||[];try{localStorage.setItem("xu",nx)}catch(e){}}if(ch){hid=v.hid||[];try{localStorage.setItem("hid",nh)}catch(e){}rH()}if(cx)rX()},()=>{});
  /* ===== લાઈવ ડ્રાફ્ટ સિંક: લખતા લખતા (સેવ પહેલાં) બીજા ફોનમાં દેખાય ===== */
  const CID=Math.random().toString(36).slice(2,10);let last="",ready=false,tm=null;
