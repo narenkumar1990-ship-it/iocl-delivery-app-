@@ -10,7 +10,7 @@
 h1{font-size:20px;margin:6px 0 10px;color:var(--a)}h2{font-size:15px;margin:0 0 8px}
 .card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:12px}
 input,select{width:100%;padding:9px 6px;border:1px solid var(--b);border-radius:8px;background:var(--bg);color:var(--t);font-size:16px;text-align:center}
-input.l{text-align:left}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input.l{text-align:left}
 .g{display:grid;grid-template-columns:56px 1fr 1fr 1fr 1fr;gap:5px;align-items:center;margin-bottom:5px}
 .h{font-size:11px;color:var(--m);text-align:center}
 .g input{padding:9px 1px;font-size:15px;min-width:0}
@@ -50,18 +50,377 @@ window.claude={use:n=>n==="db"?window.__dbP:Promise.resolve(null)};
 #lg input{margin:6px 0;text-align:left}
 #lg .er{color:var(--bad);font-size:13px;min-height:18px}
 </style>
-</head><body>
+<style>
+@media screen {
+  :root {
+    --bg: #f5f2ea;
+    --c: #fffefa;
+    --t: #172b46;
+    --m: #6f7b8b;
+    --a: #b8893d;
+    --b: #e5dece;
+    --ok: #137a69;
+    --bad: #b5474b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111a2a;
+      --c: #1a2639;
+      --t: #eff4fb;
+      --m: #a9b6c7;
+      --a: #d7ad64;
+      --b: #334258;
+      --ok: #50c7a7;
+      --bad: #ff8b92;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111a2a;
+    --c: #1a2639;
+    --t: #eff4fb;
+    --m: #a9b6c7;
+    --a: #d7ad64;
+    --b: #334258;
+    --ok: #50c7a7;
+    --bad: #ff8b92;
+  }
+  body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 14px;
+    max-width: 1860px;
+    min-height: 100vh;
+    padding: clamp(14px, 3vw, 32px);
+    background:
+      radial-gradient(ellipse at 8% 0%, rgba(184, 137, 61, .11), transparent 34rem),
+      var(--bg);
+    font-family: "Noto Sans Gujarati", "Nirmala UI", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--t);
+    font-size: clamp(23px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+  h1 .version {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--b);
+    border-radius: 999px;
+    padding: 4px 9px;
+    background: var(--c);
+    color: var(--m);
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+  #sync {
+    position: sticky;
+    top: 10px;
+    margin: 0;
+    border: 1px solid var(--b) !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    background: color-mix(in srgb, var(--c) 92%, transparent) !important;
+    color: var(--t);
+    box-shadow: 0 8px 24px rgba(23, 43, 70, .08);
+    backdrop-filter: blur(12px);
+  }
+  .card {
+    margin: 0;
+    border: 1px solid var(--b);
+    border-radius: 18px;
+    padding: clamp(15px, 2vw, 22px);
+    background: var(--c);
+    box-shadow: 0 12px 30px rgba(23, 43, 70, .065);
+  }
+  .card h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 14px;
+    color: var(--t);
+    font-size: 17px;
+    font-weight: 750;
+    letter-spacing: -.01em;
+  }
+  .card h2::before {
+    content: "";
+    width: 4px;
+    height: 19px;
+    flex: 0 0 4px;
+    border-radius: 9px;
+    background: var(--a);
+  }
+  #bktoggle { width: auto; min-height: 38px; margin: 0 0 0 auto; padding: 7px 12px; box-shadow: none; font-size: 13px; }  .card h2 .pl { margin-left: auto; }
+  input, select {
+    min-width: 0;
+    min-height: 46px;
+    border: 1px solid var(--b);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: color-mix(in srgb, var(--bg) 58%, var(--c));
+    color: var(--t);
+    font: inherit;
+    font-size: 15px;
+    text-align: left;
+    transition: border-color .16s, box-shadow .16s, background .16s;
+  }
+  input[type="number"] {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  input:focus, select:focus {
+    outline: 0;
+    border-color: var(--ok);
+    background: var(--c);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 17%, transparent);
+  }
+  input.l { text-align: left; }
+  .meta-card .r { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  .meta-card .r input { width: 100% !important; }
+  .g {
+    grid-template-columns: 54px repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    align-items: center;
+    margin: 0 0 7px;
+  }
+  .g input {
+    min-height: 43px;
+    border-radius: 10px;
+    padding: 8px 5px;
+    font-size: 14px;
+  }
+  .g .h {
+    color: var(--m);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .cs { color: var(--m); font-size: 12px; }
+  .r {
+    gap: 12px;
+    margin: 5px 0;
+    padding: 3px 0;
+    color: var(--t);
+    font-weight: 550;
+  }
+  .r input { width: min(42%, 190px); }
+  .tot {
+    color: var(--ok);
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .big {
+    border: 1px solid var(--b);
+    border-radius: 14px;
+    padding: 14px;
+    background: color-mix(in srgb, var(--ok) 9%, var(--c));
+    color: var(--t);
+    font-size: 17px;
+    font-weight: 750;
+  }
+  .pl {
+    width: 34px;
+    height: 34px;
+    margin-left: 8px;
+    border: 0;
+    box-shadow: 0 4px 10px color-mix(in srgb, var(--a) 22%, transparent);
+    font-size: 20px;
+  }
+  .x {
+    border-radius: 7px;
+    padding: 3px 7px;
+    font-weight: 700;
+  }
+  button {
+    min-height: 46px;
+    margin: 0;
+    border-radius: 12px;
+    padding: 11px 14px;
+    background: var(--a);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--a) 20%, transparent);
+    cursor: pointer;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    transition: transform .15s, box-shadow .15s, filter .15s;
+  }
+  button:hover { transform: translateY(-1px); filter: brightness(1.04); box-shadow: 0 8px 18px color-mix(in srgb, var(--a) 24%, transparent); }
+  button:active { transform: translateY(0); }
+  button.s {
+    border: 1px solid var(--b);
+    background: color-mix(in srgb, var(--c) 76%, var(--bg));
+    box-shadow: none;
+    color: var(--t);
+  }
+  button#pr, button#rp { background: linear-gradient(135deg, #29496d, #172f50); box-shadow: 0 6px 16px rgba(23, 47, 80, .2); }
+  button#da { background: linear-gradient(135deg, #c69c54, #a9792e); box-shadow: 0 6px 16px rgba(169, 121, 46, .22); }
+  button#bk { background: linear-gradient(135deg, #227c68, #145747); box-shadow: 0 6px 16px rgba(20, 87, 71, .2); }
+  #actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  #actions button { width: 100%; }
+  #histcard .ex { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 4px; }
+  .hi {
+    align-items: center;
+    gap: 12px;
+    border-bottom-color: var(--b);
+    padding: 10px 2px;
+  }
+  #hist .hi > span:last-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  #hs { width: 100%; margin: 0 0 8px; }
+  .hist-actions { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 8px; margin: 0 0 8px; }
+  .hist-actions button { width: 100%; padding-inline: 8px; font-size: 13px; }
+  #hm { width: 100%; margin-top: 8px; }  #bkcard .cs { line-height: 1.55; }
+  .np { -webkit-tap-highlight-color: transparent; }
+  @media (min-width: 850px) {
+    body { grid-template-columns: minmax(0, 1.06fr) minmax(340px, .94fr); gap: 16px; }
+    body > h1 { grid-column: 1; grid-row: 1; align-self: center; }
+    #metaCard { grid-column: 2; grid-row: 1; }
+    #sync { grid-column: 1 / -1; grid-row: 2; }
+    #actions, #histcard, #bkcard, body > .cs { grid-column: 1 / -1; }
+    #refillCard { grid-column: 1; grid-row: 3 / span 2; }
+    #deductCard { grid-column: 2; grid-row: 3; }
+    #cashCard { grid-column: 2; grid-row: 4; }
+  }
+  @media (min-width: 1000px) {
+    body { grid-template-columns: minmax(0, 1.22fr) repeat(2, minmax(0, 1fr)); }
+    #metaCard { grid-column: 2 / 4; grid-row: 1; }
+    #sync { grid-column: 1 / 4; grid-row: 2; }
+    #refillCard { grid-column: 1; grid-row: 3; }
+    #deductCard { grid-column: 2; grid-row: 3; }
+    #cashCard { grid-column: 3; grid-row: 3; }
+  }
+  @media (min-width: 1500px) {
+    body { grid-template-columns: minmax(0, 1.22fr) repeat(3, minmax(0, 1fr)); }
+    body > h1 { grid-column: 1; grid-row: 1; }
+    #metaCard { grid-column: 2 / 5; grid-row: 1; }
+    #sync { grid-column: 1 / 5; grid-row: 2; }
+    #refillCard { grid-column: 1; grid-row: 3; }
+    #deductCard { grid-column: 2; grid-row: 3; }
+    #cashCard { grid-column: 3; grid-row: 3; }
+    #histcard { grid-column: 4; grid-row: 3; }
+    #actions, #bkcard, body > .cs { grid-column: 1 / -1; }
+    #hist { max-height: 380px; overflow-y: auto; overscroll-behavior: contain; }
+  }  @media (max-width: 560px) {
+    body { gap: 11px; padding: 12px; }
+    .card { border-radius: 15px; padding: 15px 13px; }
+    .card h2 { margin-bottom: 11px; }
+    .g { grid-template-columns: 42px repeat(4, minmax(0, 1fr)); gap: 4px; }
+    .g input { min-height: 41px; padding: 7px 2px; font-size: 13px; }
+    .g .h { font-size: 9px; }
+    .r { gap: 8px; font-size: 14px; }
+    .r input { width: min(44%, 170px); padding-inline: 9px; }
+    #actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    #sv, #da, #mg { grid-column: 1 / -1; }
+    #hist .hi { align-items: flex-start; }
+    #hist .hi > span:first-child { line-height: 1.4; }
+  }
+  @media (max-width: 360px) {
+    .meta-card .r { grid-template-columns: 1fr; }
+    h1 { flex-wrap: wrap; }
+  }
+}
+@media screen {
+  body { background: radial-gradient(ellipse at 8% 0%, rgba(184,137,61,.10), transparent 34rem), linear-gradient(180deg,#f8f6f0 0%,var(--bg) 70%); }
+  h1 { color: #172b46; text-shadow: 0 1px 0 rgba(255,255,255,.65); }
+  #metaCard { border-color: #ded2b7; background: linear-gradient(135deg,#fffefa,#fbf8f0); }
+  #sync { border-color: color-mix(in srgb, var(--a) 30%, var(--b)) !important; }
+  .card { box-shadow: 0 12px 30px rgba(23,43,70,.065); }
+  .card h2::before { background: linear-gradient(180deg,#d8b76d,#a9792e); }
+  input,select { box-shadow: inset 0 1px 2px rgba(23,43,70,.025); }
+  .tot { letter-spacing: -.015em; }
+  button { background: linear-gradient(135deg,#c69c54,#a9792e); color:#fff; }
+  button#sv { background: linear-gradient(135deg,#29496d,#172f50); box-shadow:0 6px 16px rgba(23,47,80,.2); }
+  button#pr,button#rp { background:linear-gradient(135deg,#29496d,#172f50); }
+  button#da { background:linear-gradient(135deg,#c69c54,#a9792e); }
+  button#bk { background:linear-gradient(135deg,#227c68,#145747); }
+  button.s { background:linear-gradient(180deg,#fffefa,#f4f0e7); }
+  .big { background:linear-gradient(135deg,color-mix(in srgb,var(--ok) 11%,var(--c)),color-mix(in srgb,var(--ok) 5%,var(--c))); }
+}
+@page { size:A4 portrait; margin:7mm; }
+@media print {
+  html,body { print-color-adjust:exact!important; -webkit-print-color-adjust:exact!important; }
+  body:not(.pp) { max-width:none; padding:0; color:#172b46; background:#fff; }
+  body:not(.pp) h1 { padding:0 0 6px; border-bottom:2px solid #b8893d; color:#172b46; }
+  body:not(.pp) .card { border:1px solid #d9d4c8; border-radius:9px; box-shadow:none; }
+  body:not(.pp) input,body:not(.pp) select { background:#fff; }
+  body.pp #pv { color:#172b46; font-family:"Noto Sans Gujarati","Nirmala UI","Segoe UI",sans-serif; }
+  #pv > h1 { display:block; margin:0 0 5px; padding:0 0 7px; border-bottom:2px solid #b8893d; color:#172b46; font-size:20px; font-weight:800; }
+  #pv > p { margin:0 0 12px; padding:6px 9px; border:1px solid #e5dece; border-radius:6px; background:#f8f5ee; color:#43536a; font-size:11px; }
+  #pv .db { margin:0 0 9px; padding:8px 9px; border:1px solid #ded9ce; border-left:3px solid #b8893d; border-radius:7px; background:#fffefa; break-inside:avoid; page-break-inside:avoid; }
+  #pv .hd { margin:-8px -9px 7px; padding:6px 9px; border-bottom:1px solid #e5dece; border-radius:6px 6px 0 0; background:#f7f3e9; color:#172b46; font-size:11px; }
+  #pv .pw { grid-template-columns:1.35fr 1fr; gap:10px; }
+  #pv h2 { margin:5px 0 3px; color:#203b5c; font-size:12px; font-weight:750; }
+  #pv table { border-collapse:collapse; width:100%; margin:3px 0 6px; }
+  #pv td,#pv th { border:1px solid #d9dce2; padding:3px 4px; color:#26364b; font-size:9px; }
+  #pv th { border-color:#29496d; background:#29496d; color:#fff; font-weight:700; }
+  #pv td:first-child,#pv th:first-child { text-align:left; }
+  #pv tr:last-child td,#pv tr:last-child th { background:#f5f0e3; color:#172b46; font-weight:750; }
+  #pv .pw > div:last-child h2:last-child { padding:5px 7px; border:1px solid #d7e7df; border-radius:5px; background:#edf6f1; color:#137a69; text-align:center; }
+
+  #pv .report-sum { margin:0 0 6px; padding:5px 8px; border:1px solid #b8893d; border-radius:6px; background:#f7f2e7; color:#172b46; font-size:10px; }
+  #pv .report-sum b { color:#172b46; }
+  #pv .slip { height:128mm; margin:0; padding:0; overflow:hidden; break-inside:avoid; page-break-inside:avoid; }
+  #pv .slip > .db { margin:0; }
+  #pv .pagebreak { height:0; break-after:page; page-break-after:always; }
+}@media screen {
+ body { max-width:1540px; gap:11px; padding:clamp(10px,2vw,22px); font-size:15px; }
+ .card { border-radius:15px; padding:clamp(12px,1.5vw,18px); }
+ .card h2 { margin-bottom:10px; font-size:15px; }
+ input,select { min-height:40px; border-radius:10px; padding:8px 10px; font-size:14px; }
+ .meta-card .r { gap:8px; }
+ .g { gap:5px; margin-bottom:5px; }
+ .g input { min-height:37px; padding:6px 4px; font-size:13px; }
+ .r { gap:9px; margin:3px 0; font-size:14px; }
+ .r input { min-height:38px; }
+ .tot { font-size:18px; }
+ .big { border-radius:11px; padding:10px; font-size:15px; }
+ .pl { width:30px; height:30px; }
+ button { min-height:40px; border-radius:10px; padding:8px 11px; font-size:14px; }
+ #actions { gap:8px; }
+ .hi { padding:7px 2px; }
+ @media (max-width:560px) {
+  body { gap:10px; padding:10px; }
+  .card { border-radius:13px; padding:12px 11px; }
+ }
+}@media screen {
+ h1 { flex-wrap:wrap; }
+ #sync.sync-status {
+  position:static; top:auto; z-index:auto; flex:0 1 auto; width:auto; max-width:100%;
+  margin:0 0 0 auto!important; border-radius:999px!important; padding:5px 9px!important;
+  background:color-mix(in srgb,var(--ok) 8%,var(--c))!important; color:var(--ok);
+  box-shadow:none; backdrop-filter:none; font-size:11px!important; font-weight:700;
+  line-height:1.25!important; white-space:nowrap;
+ }
+}</style></head><body>
 <div id="pin"><div class="pb"><div style="font-size:34px">🔒</div><h2>પિન નાખો</h2><input id="pinp" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"><div id="pine"></div></div></div>
 <script>(function(){const h=t=>{let x=5381;for(let i=0;i<t.length;i++)x=((x<<5)+x+t.charCodeAt(i))|0;return(x>>>0).toString(36)};const OK="yjfaeb";const p=document.getElementById("pin");try{if(sessionStorage.getItem("pinok")==="1"){p.style.display="none";return}}catch(e){}
 const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.value.length>=4){if(h(i.value)===OK){try{sessionStorage.setItem("pinok","1")}catch(e){}p.style.display="none";i.value="";document.getElementById("pine").textContent="";window.dispatchEvent(new Event("pinok"))}else{document.getElementById("pine").textContent="પિન ખોટો છે";i.value=""}}});setTimeout(()=>i.focus(),50)})();</script>
 
 
-<h1>⛽ રિફિલ હિસાબ <small style="font-size:11px;color:var(--m);font-weight:400">v10 લાઈવ</small></h1>
-<div id="sync" style="position:sticky;top:0;z-index:50;background:var(--c);border:1px solid var(--b);border-radius:8px;padding:8px 10px;font-size:14px;font-weight:600;line-height:1.35;margin:0 0 8px">⏳ પિન નાખો, પછી સિંક જોડાશે…</div>
+<h1>રિફિલ હિસાબ <small class="version">v10 લાઈવ</small><span id="sync" class="sync-status">⏳ પિન નાખો, પછી સિંક જોડાશે…</span></h1>
 
-<div class="card"><div class="r"><input class="l" id="dt" type="date" style="width:48%"><input class="l" id="nm" value="KALALI GODOWN" placeholder="ડીલીવરી મેનનું નામ" style="width:48%"></div></div>
 
-<div class="card"><h2 style="display:flex;align-items:center">રિફિલ (ગાંત્રી પ્રમાણે)<span class="pl np" id="ca" title="નવી સાઈઝ ઉમેરો">+</span></h2>
+<div class="card meta-card" id="metaCard"><div class="r"><input class="l" id="dt" type="date" style="width:48%"><input class="l" id="nm" value="KALALI GODOWN" placeholder="ડીલીવરી મેનનું નામ" style="width:48%"></div></div>
+
+<div class="card refill-card" id="refillCard"><h2 style="display:flex;align-items:center">રિફિલ (ગાંત્રી પ્રમાણે)<span class="pl np" id="ca" title="નવી સાઈઝ ઉમેરો">+</span></h2>
 <div class="g"><span></span><span class="h">કુલ</span><span class="h">ઓનલાઈન</span><span class="h">પેટીએમ</span><span class="h">ભાવ ₹</span></div>
 <div id="rows"></div>
 <div id="cz"></div>
@@ -69,7 +428,7 @@ const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.val
 <input class="l" id="xtraR" placeholder="રિમાર્ક / નોંધ લખો" style="display:none;margin:0 0 8px">
 <div class="r"><span>કુલ રકમ</span><span class="tot" id="tot">0</span></div></div>
 
-<div class="card"><h2>બાદ</h2>
+<div class="card deduct-card" id="deductCard"><h2>બાદ</h2>
 <div class="r" id="rw_onl"><span>ચા ₹<span class="x np" onclick="hd('onl')">✕</span></span><input id="onl" type="number" inputmode="numeric"></div>
 <div class="r" id="rw_of"><span>ઓફિસ ₹<span class="x np" onclick="hd('of')">✕</span></span><input id="of" type="number" inputmode="numeric"></div>
 <div class="r" id="rw_fh"><span>ફૂલ હાર ₹<span class="x np" onclick="hd('fh')">✕</span></span><input id="fh" type="number" inputmode="numeric"></div>
@@ -78,27 +437,33 @@ const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.val
 <div id="rb" class="np" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 <div class="r"><span>કેશ મળવી જોઈએ</span><span class="tot" id="exp">0</span></div></div>
 
-<div class="card"><h2>નોટો</h2><div id="notes"></div>
+<div class="card cash-card" id="cashCard"><h2>નોટો</h2><div id="notes"></div>
 <div class="r"><span>પરચુરણ ₹</span><input id="pc" type="number" inputmode="numeric"></div>
 <div class="r"><span>ગણેલ કેશ</span><span class="tot" id="act">0</span></div>
 <div class="big" id="diff"></div></div>
 
-<button id="sv">💾 સેવ કરો</button>
+<div id="actions" class="np"><button id="sv">💾 સેવ કરો</button>
 <button id="pr" style="background:#1971c2">🖨️ પ્રિન્ટ</button>
 <button class="s" id="cl">🧹 નવો હિસાબ</button>
 <button id="da" style="background:#7048e8">📲 એપ ડાઉનલોડ (ફોનમાં રાખવા)</button>
 
-<button class="s" id="mg" style="display:none">☁️ આ ફોનનો જૂનો ડેટા ક્લાઉડમાં મોકલો</button>
+<button class="s" id="mg" style="display:none">☁️ આ ફોનનો જૂનો ડેટા ક્લાઉડમાં મોકલો</button></div>
 
-<div class="card" id="histcard"><h2>જૂના હિસાબ</h2><div class="ex"><input id="fa" type="date"><input id="fb" type="date"></div><div class="cs" style="text-align:left;margin-bottom:6px">તારીખથી — તારીખ સુધી (ખાલી હોય તો બધા)</div><button id="rp" style="background:#1971c2;margin-bottom:8px">🖨️ આ તારીખોની પ્રિન્ટ</button><div id="hist"></div></div>
-<div class="card np" id="bkcard"><h2>બેકઅપ / ક્લીનઅપ</h2>
+<div class="card" id="histcard"><h2>જૂના હિસાબ</h2>
+<input id="hs" type="search" aria-label="નામ અથવા તારીખથી શોધો" placeholder="નામ અથવા તારીખથી શોધો">
+<div class="ex"><input id="fa" type="date" aria-label="શરૂઆતની તારીખ"><input id="fb" type="date" aria-label="અંતિમ તારીખ"></div>
+<div class="cs" style="text-align:left;margin:0 0 8px">તારીખથી — તારીખ સુધી (ખાલી હોય તો બધા)</div>
+<div class="hist-actions"><button id="clearHist" class="s" type="button">↺ ફિલ્ટર સાફ કરો</button><button id="rp" type="button">🖨️ આ તારીખોની પ્રિન્ટ</button></div>
+<div id="historyCount" class="cs" style="text-align:left;margin:0 0 4px"></div>
+<div id="hist"></div>
+<button id="hm" class="s" type="button" style="display:none">વધુ હિસાબ બતાવો</button></div><div class="card np" id="bkcard"><h2>બેકઅપ / ક્લીનઅપ<button id="bktoggle" class="s" type="button" aria-expanded="false" aria-controls="bkcontent">ખોલો ▾</button></h2><div id="bkcontent" hidden>
 <button id="bk" style="background:#2b8a3e">💾 બેકઅપ ડાઉનલોડ (બધા હિસાબ)</button>
 <button id="im" class="s">📥 બેકઅપ ઇમ્પોર્ટ</button>
 <input id="imf" type="file" accept=".json,application/json" style="display:none">
 <button id="ex" class="s">📊 બધા હિસાબ Excel માં (CSV)</button>
 <button id="dd" class="s">🧹 ડુપ્લિકેટ સાફ કરો</button>
 <button id="wp" class="s" style="color:var(--bad)">🗑 બધો ડેટા ભૂંસો (ક્લાઉડ સહિત)</button>
-<div class="cs" style="margin-top:6px">બેકઅપ ફાઇલ સાચવી રાખો. ઇમ્પોર્ટ કરતાં એક તારીખનો એક જ હિસાબ રહેશે.</div></div>
+<div class="cs" style="margin-top:6px">બેકઅપ ફાઇલ સાચવી રાખો. ઇમ્પોર્ટ કરતાં એક તારીખનો એક જ હિસાબ રહેશે.</div></div></div>
 <div id="pv"></div>
 <div class="cs">ડેટા ક્લાઉડમાં સેવ થાય છે (🟢 લાઈવ સિંક ચાલુ હોય ત્યારે). બેકઅપ લેતા રહો.</div>
 
@@ -114,7 +479,7 @@ let rows="";T.forEach((t,i)=>{rows+=`<div class="g"><span style="font-size:12px"
 $("rows").innerHTML=rows;
 $("notes").innerHTML=D.map(d=>`<div class="r"><span>${d} ×</span><input type="number" inputmode="numeric" id="n${d}"><span id="s${d}" style="width:70px;text-align:right">0</span></div>`).join("");
 $("dt").valueAsDate=new Date();
-const ids=()=>[...document.querySelectorAll("input")].map(e=>e.id).filter(i=>i&&!["ea","en","fa","fb","imf"].includes(i));
+const ids=()=>[...document.querySelectorAll("input")].map(e=>e.id).filter(i=>i&&!["ea","en","fa","fb","hs","imf"].includes(i));
 function calc(){
  tot=0;
  T.forEach((t,i)=>{const q=n($("q"+i).value),c=Math.max(0,q-n($("o"+i).value)-n($("p"+i).value)),r=n($("r"+i).value),a=c*r;tot+=a;$("c"+i).textContent=q?`કેશ ${c} × ${r} = ${f(a)}`:""});
@@ -169,9 +534,20 @@ function snap(){const o={};ids().forEach(i=>o[i]=$(i).value);o.xtraS=$("xtraS").
 const dkey=x=>((x.d&&x.d.dt)||"")+"|"+((x.d&&x.d.nm)||"").trim().toLowerCase();
 const sm=x=>{const kh=n(x.d.khIn)+n(x.d.fh)+(x.xs||[]).reduce((a,e)=>a+e.a,0);return{kh,exp:x.tot-n(x.d.onl)-kh-n(x.d.of)}};
 const inR=x=>{const a=$("fa").value,b=$("fb").value,d=x.d.dt||"";return(!a||d>=a)&&(!b||d<=b)};
-function render(){const L=load().map((x,i)=>[x,i]).filter(([x])=>inR(x));
-$("hist").innerHTML=L.length?L.map(([x,i])=>`<div class="hi"><span onclick="openH(${i})" style="cursor:pointer">${fd(x.d.dt)} ${esc(x.d.nm||"")}</span><span>${f(x.act)} <b style="color:${Math.abs(x.diff)<.5?"var(--ok)":"var(--bad)"}">${Math.abs(x.diff)<.5?"✓":(x.diff>0?"+":"-")+Math.round(Math.abs(x.diff))}</b><span class="x" style="color:inherit" onclick="pH(${i})">🖨️</span><span class="x" onclick="del(${i})">🗑</span></span></div>`).join(""):'<div class="cs">આ તારીખોમાં કોઈ હિસાબ નથી</div>'}
-function pp(){document.body.classList.add("pp");const cl=()=>{document.body.classList.remove("pp");$("pv").innerHTML=""};window.onafterprint=cl;setTimeout(cl,120000);window.print()}
+const histPageSize=8;let histShown=histPageSize;
+function render(){
+ const q=$("hs").value.trim().toLocaleLowerCase();
+ const L=load().map((x,i)=>[x,i]).filter(([x])=>{
+  const d=x.d.dt||"",name=x.d.nm||"",search=[d,fd(d),name].join(" ").toLocaleLowerCase();
+  return inR(x)&&(!q||search.includes(q));
+ });
+ const shown=L.slice(0,histShown);
+ $("historyCount").textContent=L.length?"કુલ "+L.length+"માંથી "+shown.length+" હિસાબ દેખાય છે":"કોઈ હિસાબ મળ્યો નથી";
+ $("hist").innerHTML=shown.length?shown.map(([x,i])=>'<div class="hi"><span onclick="openH('+i+')" style="cursor:pointer">'+fd(x.d.dt)+' '+esc(x.d.nm||"")+'</span><span>'+f(x.act)+' <b style="color:'+(Math.abs(x.diff)<.5?"var(--ok)":"var(--bad)")+'">'+(Math.abs(x.diff)<.5?"✓":(x.diff>0?"+":"-")+Math.round(Math.abs(x.diff)))+'</b><span class="x" style="color:inherit" onclick="pH('+i+')">🖨️</span><span class="x" onclick="del('+i+')">🗑</span></span></div>').join(""):'<div class="cs">આ ફિલ્ટરમાં કોઈ હિસાબ નથી</div>';
+ const more=Math.min(histPageSize,L.length-shown.length),button=$("hm");
+ button.style.display=more?"block":"none";
+ button.textContent="વધુ "+more+" હિસાબ બતાવો";
+}function pp(){document.body.classList.add("pp");const cl=()=>{document.body.classList.remove("pp");$("pv").innerHTML=""};window.onafterprint=cl;setTimeout(cl,120000);window.print()}
 window.pH=i=>{if((tot||act)&&!confirm("અત્યારનો હિસાબ આ સેવ કરેલા હિસાબથી બદલાઈ જશે. આગળ વધો?"))return;openH(i);dl("print")};
 function blk(x){const d=x.d,tr=a=>"<tr>"+a.map(v=>"<td>"+v+"</td>").join("")+"</tr>";
  let tot=0;
@@ -187,9 +563,11 @@ function pR(){const L=load().filter(inR).sort((a,b)=>(a.d.dt||"").localeCompare(
  if(!L.length){alert("આ તારીખોમાં કોઈ હિસાબ સેવ નથી");return}
  const R=L.map(blk),a=$("fa").value,b=$("fb").value;
  const sum=k=>R.reduce((t,r)=>t+r[k],0);
- $("pv").innerHTML=`<h1>શ્રી નૃસિંહ કૃપા ગેસ એજન્સી</h1><p>હિસાબ: ${a?fd(a):"શરૂઆતથી"} થી ${b?fd(b):"આજ સુધી"} (${L.length} હિસાબ)</p>`+R.map(r=>r.h).join("")+`<div class="db"><b>કુલ ${L.length} હિસાબ:</b> રિફિલ રકમ ${f(sum("tot"))} &nbsp; | &nbsp; કેશ મળવી જોઈએ ${f(sum("exp"))} &nbsp; | &nbsp; ગણેલ કેશ ${f(sum("act"))}</div>`;
- const pv=$("pv");pv.style.setProperty("--w","741px");pv.style.setProperty("--z",1);pp()}
-window.openH=i=>{const x=load()[i];Object.keys(x.d).forEach(k=>{if($(k))$(k).value=x.d[k]});xs=(x.xs||[]).map(e=>({...e}));if(!x.xs&&x.exps)x.exps.forEach(e=>xs.push({c:e.c,a:e.a,r:e.nt||""}));if(n(x.d.khIn))xs.push({c:"અન્ય",a:n(x.d.khIn),r:""});$("khIn").value="";$("fh").value=x.d.fh||"";$("xtra").value=x.d.xtra||"";$("xtraR").value=x.d.xtraR||"";$("xtraS").value=x.d.xtraS||"";xtT();xs=xs.filter(e=>{if(e.c==="ફૂલ હાર"){$("fh").value=n($("fh").value)+e.a;return false}return true});cz=(x.cz||[]).map(e=>({...e}));rC();rX();calc();scrollTo(0,0)};
+ const entries=R.map((r,i)=>`<section class="slip">${r.h}</section>${i%2===1&&i<L.length-1?'<div class="pagebreak"></div>':""}`).join("");
+ $("pv").innerHTML=`<h1>શ્રી નૃસિંહ કૃપા ગેસ એજન્સી</h1><p>હિસાબ: ${a?fd(a):"શરૂઆતથી"} થી ${b?fd(b):"આજ સુધી"} (${L.length} હિસાબ)</p><div class="report-sum"><b>કુલ ${L.length} હિસાબ:</b> રિફિલ રકમ ${f(sum("tot"))} &nbsp; | &nbsp; કેશ મળવી જોઈએ ${f(sum("exp"))} &nbsp; | &nbsp; ગણેલ કેશ ${f(sum("act"))}</div>`+entries;
+ const pv=$("pv");pv.style.cssText="display:block;position:absolute;left:-9999px;top:0;font-size:11px;width:741px";
+ pv.querySelectorAll(".slip > .db").forEach(el=>{const h=el.getBoundingClientRect().height,target=478;if(h>target){const z=target/h;el.style.transform="scale("+z+")";el.style.transformOrigin="top left";el.style.width=(100/z)+"%"}});
+ pv.style.cssText="";pv.style.setProperty("--w","741px");pv.style.setProperty("--z",1);pp()}window.openH=i=>{const x=load()[i];Object.keys(x.d).forEach(k=>{if($(k))$(k).value=x.d[k]});xs=(x.xs||[]).map(e=>({...e}));if(!x.xs&&x.exps)x.exps.forEach(e=>xs.push({c:e.c,a:e.a,r:e.nt||""}));if(n(x.d.khIn))xs.push({c:"અન્ય",a:n(x.d.khIn),r:""});$("khIn").value="";$("fh").value=x.d.fh||"";$("xtra").value=x.d.xtra||"";$("xtraR").value=x.d.xtraR||"";$("xtraS").value=x.d.xtraS||"";xtT();xs=xs.filter(e=>{if(e.c==="ફૂલ હાર"){$("fh").value=n($("fh").value)+e.a;return false}return true});cz=(x.cz||[]).map(e=>({...e}));rC();rX();calc();scrollTo(0,0)};
 window.del=i=>{const h=load();if(DB&&h[i]&&h[i].id){DB.doc("hisab/"+h[i].id).delete().catch(()=>alert("કાઢી શકાયું નહીં"));return}h.splice(i,1);save(h);render()};
 $("sv").onclick=async()=>{calc();const en={d:snap(),xs:xs.map(e=>({...e})),cz:cz.map(e=>({...e})),act,diff,tot,ts:Date.now()};
  const ex=load().filter(x=>dkey(x)===dkey(en));
@@ -216,7 +594,22 @@ async function dl(kind){
   await d.save({filename:"hisab-"+dt+".csv",data:s});
  }else{
   const tr=a=>"<tr>"+a.map(v=>"<td>"+v+"</td>").join("")+"</tr>";
-  const h=`<!DOCTYPE html><html lang="gu"><head><meta charset="utf-8"><title>હિસાબ ${fd(dt)}</title><style>body{font:15px system-ui,sans-serif;max-width:560px;margin:20px auto;padding:0 10px}table{border-collapse:collapse;width:100%;margin:8px 0}td,th{border:1px solid #888;padding:5px 7px;text-align:right}td:first-child,th:first-child{text-align:left}h2{margin:16px 0 4px}</style></head><body><h1>શ્રી નૃસિંહ કૃપા ગેસ એજન્સી</h1><p>તારીખ: ${fd(dt)} &nbsp; ડીલીવરી મેન: ${esc(nm)}</p><h2>રિફિલ</h2><table><tr><th>સાઈઝ</th><th>કુલ</th><th>ઓનલાઈન</th><th>પેટીએમ</th><th>કેશ</th><th>ભાવ</th><th>રકમ</th></tr>${L.filter(r=>r[1]).map(tr).join("")}${xt?`<tr><td>એક્સ્ટ્રા${xlab($("xtraS").value,xr)?" · "+esc(xlab($("xtraS").value,xr)):""}</td><td colspan="6">${f(xt)}</td></tr>`:""}<tr><th>કુલ</th><td colspan="6"><b>${f(tot)}</b></td></tr></table><table>${oi?`<tr><td>ચા</td><td>${f(oi)}</td></tr>`:""}${of?`<tr><td>ઓફિસ</td><td>${f(of)}</td></tr>`:""}${fh?`<tr><td>ફૂલ હાર</td><td>${f(fh)}</td></tr>`:""}${n($("khIn").value)?`<tr><td>ખર્ચા</td><td>${f(n($("khIn").value))}</td></tr>`:""}${xs.filter(e=>e.a).map(e=>tr([esc(e.c)+(e.r?" · "+esc(e.r):""),f(e.a)])).join("")}<tr><td><b>કેશ મળવી જોઈએ</b></td><td><b>${f(exp)}</b></td></tr></table><h2>નોટો</h2><table>${N.filter(r=>r[1]).map(r=>tr([r[0]+" ×",r[1],f(r[2])])).join("")}${pc?`<tr><td>પરચુરણ</td><td></td><td>${f(pc)}</td></tr>`:""}<tr><td><b>ગણેલ કેશ</b></td><td></td><td><b>${f(act)}</b></td></tr></table><h2>${Math.abs(diff)<.5?"✅ હિસાબ બરાબર":(diff>0?"વધારો ":"ઘટ ")+f(Math.abs(diff))}</h2></body></html>`;
+  const h=`<!DOCTYPE html><html lang="gu"><head><meta charset="utf-8"><title>હિસાબ ${fd(dt)}</title><style>
+:root{color-scheme:light;--navy:#172b46;--gold:#b8893d;--line:#ded9ce;--paper:#fffefa;--wash:#f7f3e9}
+*{box-sizing:border-box}
+body{font:15px "Noto Sans Gujarati","Nirmala UI","Segoe UI",system-ui,sans-serif;max-width:760px;margin:24px auto;padding:24px;color:var(--navy);background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(23,43,70,.08)}
+h1{margin:0 0 9px;padding:0 0 9px;border-bottom:3px solid var(--gold);font-size:24px}
+p{margin:0 0 15px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--wash);color:#43536a}
+h2{margin:17px 0 6px;font-size:16px;color:#29496d}
+table{border-collapse:collapse;width:100%;margin:6px 0 12px}
+td,th{border:1px solid var(--line);padding:7px 8px;text-align:right}
+th{background:#29496d;color:#fff;font-weight:700}
+td:first-child,th:first-child{text-align:left}
+tr:last-child td{background:var(--wash);font-weight:700}
+h2:last-of-type{padding:10px;border:1px solid #d7e7df;border-radius:8px;background:#edf6f1;color:#137a69;text-align:center}
+@page{size:A4 portrait;margin:12mm}
+@media print{body{max-width:none;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}h1{font-size:19px}p{margin-bottom:10px}h2{margin-top:10px}table{margin:4px 0 8px}td,th{padding:4px 6px;font-size:10px}tr{break-inside:avoid;page-break-inside:avoid}}
+</style></head><body><h1>શ્રી નૃસિંહ કૃપા ગેસ એજન્સી</h1><p>તારીખ: ${fd(dt)} &nbsp; ડીલીવરી મેન: ${esc(nm)}</p><h2>રિફિલ</h2><table><tr><th>સાઈઝ</th><th>કુલ</th><th>ઓનલાઈન</th><th>પેટીએમ</th><th>કેશ</th><th>ભાવ</th><th>રકમ</th></tr>${L.filter(r=>r[1]).map(tr).join("")}${xt?`<tr><td>એક્સ્ટ્રા${xlab($("xtraS").value,xr)?" · "+esc(xlab($("xtraS").value,xr)):""}</td><td colspan="6">${f(xt)}</td></tr>`:""}<tr><th>કુલ</th><td colspan="6"><b>${f(tot)}</b></td></tr></table><table>${oi?`<tr><td>ચા</td><td>${f(oi)}</td></tr>`:""}${of?`<tr><td>ઓફિસ</td><td>${f(of)}</td></tr>`:""}${fh?`<tr><td>ફૂલ હાર</td><td>${f(fh)}</td></tr>`:""}${n($("khIn").value)?`<tr><td>ખર્ચા</td><td>${f(n($("khIn").value))}</td></tr>`:""}${xs.filter(e=>e.a).map(e=>tr([esc(e.c)+(e.r?" · "+esc(e.r):""),f(e.a)])).join("")}<tr><td><b>કેશ મળવી જોઈએ</b></td><td><b>${f(exp)}</b></td></tr></table><h2>નોટો</h2><table>${N.filter(r=>r[1]).map(r=>tr([r[0]+" ×",r[1],f(r[2])])).join("")}${pc?`<tr><td>પરચુરણ</td><td></td><td>${f(pc)}</td></tr>`:""}<tr><td><b>ગણેલ કેશ</b></td><td></td><td><b>${f(act)}</b></td></tr></table><h2>${Math.abs(diff)<.5?"✅ હિસાબ બરાબર":(diff>0?"વધારો ":"ઘટ ")+f(Math.abs(diff))}</h2></body></html>`;
   if(kind==="print"){const bd=h.match(/<body>([\s\S]*)<\/body>/)[1],k=bd.indexOf("<h2>નોટો</h2>"),m=bd.match(/^<h1>[\s\S]*?<\/p>/)[0];$("pv").innerHTML=m+'<div class="pw"><div>'+bd.slice(m.length,k)+'</div><div>'+bd.slice(k)+'</div></div>';const pv=$("pv");pv.style.cssText="display:block;position:absolute;left:-9999px;top:0;font-size:11px";let s=1;const fit=()=>{pv.style.width=(741/s)+"px";return pv.offsetHeight*s};for(let i=0;i<8;i++){const hh=fit();if(hh>516)s*=516/hh*0.97;else if(hh<440&&s<1.5)s=Math.min(1.5,s*Math.min(1.25,516/hh*0.97));else break}pv.style.cssText="";pv.style.setProperty("--w",(741/s)+"px");pv.style.setProperty("--z",s);document.body.classList.add("pp");const cl=()=>{document.body.classList.remove("pp");$("pv").innerHTML=""};window.onafterprint=cl;setTimeout(cl,60000);window.print();return}
   await d.save({filename:"hisab-"+dt+".html",data:h});
  }
@@ -229,11 +622,15 @@ async function dapp(){let t="";try{t=await(await fetch(location.href)).text()}ca
 }
 $("da").onclick=dapp;
 $("pr").onclick=()=>dl("print");
-$("rp").onclick=pR;["fa","fb"].forEach(i=>$(i).addEventListener("change",render));
+$("rp").onclick=pR;
+["fa","fb"].forEach(i=>$(i).addEventListener("change",()=>{histShown=histPageSize;render()}));
+$("hs").addEventListener("input",()=>{histShown=histPageSize;render()});
+$("clearHist").onclick=()=>{$("hs").value="";$("fa").value="";$("fb").value="";histShown=histPageSize;render()};
+$("hm").onclick=()=>{histShown+=histPageSize;render()};
 const hs=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return(h>>>0).toString(36)};
 const dlf=(name,data,type)=>{const u=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)};
 const tdy=()=>new Date().toLocaleDateString("en-CA");
-$("bk").onclick=()=>{const L=load().map(x=>{const {id,...y}=x;return y});if(!L.length){alert("બેકઅપ માટે કોઈ હિસાબ નથી");return}
+$("bktoggle").onclick=()=>{const box=$("bkcontent"),open=box.hidden;box.hidden=!open;$("bktoggle").setAttribute("aria-expanded",String(open));$("bktoggle").textContent=open?"બંધ કરો ▲":"ખોલો ▾"};$("bk").onclick=()=>{const L=load().map(x=>{const {id,...y}=x;return y});if(!L.length){alert("બેકઅપ માટે કોઈ હિસાબ નથી");return}
  dlf("hisab-backup-"+tdy()+".json",JSON.stringify({app:"refill-hisab",v:1,at:new Date().toISOString(),hisab:L,xu:XU}),"application/json")};
 $("ex").onclick=()=>{const L=load().slice().sort((a,b)=>(a.d.dt||"").localeCompare(b.d.dt||""));if(!L.length){alert("કોઈ હિસાબ નથી");return}
  let s="\ufeffતારીખ,નામ,કુલ રકમ,કેશ મળવી જોઈએ,ગણેલ કેશ,ફરક\n";
@@ -366,3 +763,11 @@ if(!firebaseConfig.projectId||firebaseConfig.projectId==="YOUR_PROJECT_ID"){
 }
 </script>
 </body></html>
+
+
+
+
+
+
+
+
