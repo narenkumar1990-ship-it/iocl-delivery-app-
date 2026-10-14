@@ -27,7 +27,7 @@ button.s{background:var(--b);color:var(--t)}
 #xp{display:none}
 @media print{#xp{display:block}#xl{display:none}}
 .xr{display:grid;grid-template-columns:1.3fr 1fr auto;gap:6px;align-items:center;margin-bottom:6px}.pl{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--a);color:#fff;align-items:center;justify-content:center;margin-left:8px;cursor:pointer;font-weight:700;font-size:20px;line-height:1}
-@media print{:root{--bg:#fff;--c:#fff;--t:#000;--m:#000;--b:#999;--a:#000}body{max-width:none;padding:0}button,.cs,.np,#histcard{display:none!important}.card{break-inside:avoid;border:1px solid #000;border-radius:0}input{border:0;border-bottom:1px solid #999;border-radius:0;background:#fff;color:#000}.big{border:1px solid #000;background:#fff!important;color:#000!important}.x{display:none}}
+@media print{:root{--bg:#fff;--c:#fff;--t:#000;--m:#000;--b:#999;--a:#000}body{max-width:none;padding:0}button,.cs,.np,#histcard,#b2{display:none!important}.card{break-inside:avoid;border:1px solid #000;border-radius:0}input{border:0;border-bottom:1px solid #999;border-radius:0;background:#fff;color:#000}.big{border:1px solid #000;background:#fff!important;color:#000!important}.x{display:none}}
 #pv{display:none}
 @media print{body.pp>*:not(#pv){display:none!important}body.pp #pv{display:block;font-size:11px;color:#000;width:var(--w,741px);zoom:var(--z,1)}}
 #pv .db{border:1px solid #000;padding:6px 8px;margin:0 0 8px;break-inside:avoid;page-break-inside:avoid}#pv .hd{font-size:12px;margin-bottom:2px}
@@ -433,6 +433,11 @@ window.claude={use:n=>n==="db"?window.__dbP:Promise.resolve(null)};
 #actions button:not(.zz){min-height:0!important;height:auto;padding:9px 2px!important;font-size:11.5px!important;line-height:1.25;border-radius:10px;margin-top:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.18),0 4px 0 var(--sh),0 7px 10px rgba(0,0,0,.25);word-break:keep-all}
 #actions button:not(.zz):active{transform:translateY(4px)!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.3),0 0 0 var(--sh)!important}
 #actions button:not(.zz):hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.18),0 5px 0 var(--sh),0 9px 12px rgba(0,0,0,.28)}
+#bk2{--c1:#2f5584;--c2:#172f50;--sh:#0b1830;margin-left:auto;width:auto;display:inline-block;padding:7px 14px;font-size:13px;line-height:1.25;color:#fff;border:0;border-radius:10px;cursor:pointer;background-image:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 48%,rgba(0,0,0,.14) 100%),linear-gradient(135deg,var(--c1),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.18),0 4px 0 var(--sh),0 7px 10px rgba(0,0,0,.25);text-shadow:0 1px 1px rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s;text-align:center}
+#bk2:active{transform:translateY(4px);box-shadow:inset 0 2px 4px rgba(0,0,0,.3),0 0 0 var(--sh)}
+#actions #sv{display:none!important}
+#bkcard{display:none!important}
+#b2{display:flex;gap:8px;margin:12px 0 8px}#b2 button{flex:1 1 0;min-width:0;margin:0!important;width:auto!important}#sv2{--c1:#2f5584;--c2:#172f50;--sh:#0b1830}#sv2,#pr2{display:block;padding:11px 8px;font-size:15px;color:#fff;position:relative;border:0;border-radius:12px;background-image:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 48%,rgba(0,0,0,.14) 100%),linear-gradient(135deg,var(--c1),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.18),0 5px 0 var(--sh),0 9px 14px rgba(0,0,0,.28);text-shadow:0 1px 1px rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s}#sv2:active{transform:translateY(5px);box-shadow:inset 0 2px 4px rgba(0,0,0,.3),0 0 0 var(--sh)}
 #pr2{--c1:#2b8be0;--c2:#1565b3;--sh:#0d4380;display:block;width:100%;margin:12px 0 8px;padding:11px 8px;font-size:15px;color:#fff;position:relative;border:0;border-radius:12px;
  background-image:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,0) 48%,rgba(0,0,0,.14) 100%),linear-gradient(135deg,var(--c1),var(--c2));
  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.18),0 5px 0 var(--sh),0 9px 14px rgba(0,0,0,.28);text-shadow:0 1px 1px rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s}
@@ -444,7 +449,7 @@ window.claude={use:n=>n==="db"?window.__dbP:Promise.resolve(null)};
 const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.value.length>=4){if(h(i.value)===OK){try{sessionStorage.setItem("pinok","1")}catch(e){}p.style.display="none";i.value="";document.getElementById("pine").textContent="";window.dispatchEvent(new Event("pinok"))}else{document.getElementById("pine").textContent="પિન ખોટો છે";i.value=""}}});setTimeout(()=>i.focus(),50)})();</script>
 
 
-<h1>રિફિલ હિસાબ <small class="version">v11 લાઈવ</small><span id="sync" class="sync-status">⏳ પિન નાખો, પછી સિંક જોડાશે…</span></h1>
+<h1>રિફિલ હિસાબ <small class="version">v11 લાઈવ</small><span id="sync" class="sync-status">⏳ પિન નાખો, પછી સિંક જોડાશે…</span><button id="bk2" class="np" type="button">💾 બેકઅપ</button></h1>
 
 
 <div class="card meta-card" id="metaCard"><div class="r"><input class="l" id="dt" type="date" style="width:48%"><input class="l" id="nm" value="KALALI GODOWN" placeholder="ડીલીવરી મેનનું નામ" style="width:48%"></div></div>
@@ -484,7 +489,7 @@ const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.val
 <div class="r"><span>પરચુરણ ₹</span><input id="pc" type="number" inputmode="numeric"></div>
 <div class="r"><span>ગણેલ કેશ</span><span class="tot" id="act">0</span></div>
 <div class="big" id="diff"></div>
-<button id="pr2" class="np" type="button">💾🖨️ સેવ + પ્રિન્ટ</button></div>
+<div id="b2" class="np"><button id="sv2" type="button">💾 સેવ</button><button id="pr2" type="button">🖨️ પ્રિન્ટ</button></div></div>
 
 <div id="actions" class="np"><button id="sv">💾 સેવ કરો</button>
 <button id="pr" style="background:#1971c2">📊 રિપોર્ટ</button>
@@ -495,13 +500,15 @@ const i=document.getElementById("pinp");i.addEventListener("input",()=>{if(i.val
 
 <div class="card" id="histcard"><h2>જૂના હિસાબ</h2>
 <div id="emsum" class="cs" style="text-align:left;margin:0 0 8px"></div>
+<select id="fm" aria-label="મહિના પ્રમાણે" style="width:100%;margin:0 0 8px"><option value="">📅 બધા મહિના</option></select>
 <input id="hs" type="search" aria-label="નામ અથવા તારીખથી શોધો" placeholder="નામ અથવા તારીખથી શોધો">
 <div class="ex"><input id="fa" type="date" aria-label="શરૂઆતની તારીખ"><input id="fb" type="date" aria-label="અંતિમ તારીખ"></div>
 <div class="cs" style="text-align:left;margin:0 0 8px">તારીખથી — તારીખ સુધી (ખાલી હોય તો બધા)</div>
 <div class="hist-actions"><button id="clearHist" class="s" type="button">↺ ફિલ્ટર સાફ કરો</button><button id="rp" type="button">🖨️ આ તારીખોની પ્રિન્ટ</button></div>
+<div id="chw" class="np"></div>
 <div id="historyCount" class="cs" style="text-align:left;margin:0 0 4px"></div>
 <div id="hist"></div>
-<button id="hm" class="s" type="button" style="display:none">વધુ હિસાબ બતાવો</button></div>
+<button id="hm" class="s" type="button" style="display:none">વધુ હિસાબ બતાવો</button><div id="trw" class="np"></div></div>
 <div class="card np" id="bkcard"><h2>બેકઅપ / ક્લીનઅપ<button id="bktoggle" class="s" type="button" aria-expanded="false" aria-controls="bkcontent">ખોલો ▾</button></h2><div id="bkcontent" hidden>
 <button id="bk" style="background:#2b8a3e">💾 બેકઅપ ડાઉનલોડ (બધા હિસાબ)</button>
 <button id="im" class="s">📥 બેકઅપ ઇમ્પોર્ટ</button>
@@ -596,11 +603,17 @@ function emRow(x,i){const P=pendOf(x).filter(p=>p.pend);if(!P.length)return"";le
  h+='<div class="np">'+(P.some(p=>p.rem>0)?'<span class="pl" '+b+' onclick="ekc('+i+')">✅ ખાલી જમા કરો</span>':"")+((x.cl||[]).length?'<span class="pl" style="width:auto;border-radius:14px;padding:0 10px;margin:4px 0 0;font-size:12px;background:var(--m)" onclick="ekd('+i+')">↩ ભૂલ સુધારો</span>':"")+"</div>";
  return'<div class="cs" style="text-align:left;padding:2px 0 8px;border-bottom:1px solid var(--b)">'+h+"</div>"}
 const emS=()=>{const t={};let c=0;load().forEach(x=>{const o=pendOf(x).filter(p=>p.rem>0);if(o.length)c++;o.forEach(p=>t[p.k]=(t[p.k]||0)+p.rem)});const ks=Object.keys(t);
- return ks.length?"<b>⏳ ખાલી બાકી ચાલુ:</b> "+ks.map(k=>esc(k)+" "+t[k]).join(", ")+" ("+c+" હિસાબ)":"✅ કોઈ ખાલી બાકી નથી"};
+ return ks.length?"<b>⏳ ખાલી બાકી ચાલુ:</b> "+ks.map(k=>esc(k)+" "+t[k]).join(", ")+" ("+c+" હિસાબ) "+'<span class="pl np" style="width:auto;border-radius:14px;padding:0 10px;margin:4px 0 0;font-size:12px" onclick="ekAll()">✅ બધા ખાલી જમા કરો</span>':"✅ કોઈ ખાલી બાકી નથી"};
 function emSave(i,nx,h){delete nx.id;const x=h[i];if(DB&&x.id){DB.doc("hisab/"+x.id).set(nx).catch(()=>alert("સેવ થયું નહીં"))}else{h[i]=nx;save(h);render()}}
 window.ekc=i=>{const h=load(),x=h[i];if(!x)return;const today=new Date().toLocaleDateString("en-CA"),add=[];
  pendOf(x).filter(p=>p.rem>0).forEach(p=>{const v=prompt(fd(x.d.dt)+" · "+bkN(x)+p.k+"\nબાકી ખાલી: "+p.rem+"\nઆજે ("+fd(today)+") કેટલા ખાલી જમા થયા?",String(p.rem)),k=Math.min(p.rem,Math.max(0,parseInt(v)||0));if(k>0)add.push({dt:today,k:p.k,n:k})});
  if(add.length)emSave(i,{...x,cl:(x.cl||[]).concat(add)},h)};
+window.ekAll=()=>{const h=load(),today=tdy(),J=[];h.forEach((x,i)=>{const add=pendOf(x).filter(p=>p.rem>0).map(p=>({dt:today,k:p.k,n:p.rem}));if(add.length)J.push({i,x,add})});
+ if(!J.length){alert("કોઈ ખાલી બાકી નથી");return}
+ const t={};J.forEach(o=>o.add.forEach(a=>t[a.k]=(t[a.k]||0)+a.n));
+ if(!confirm("✅ "+J.length+" હિસાબના બધા ખાલી બાકી "+fd(today)+" એ જમા કરવા છે?\n\n"+Object.keys(t).map(k=>k+": "+t[k]).join("\n")+"\n\n(ભૂલ થાય તો જૂના હિસાબમાં '↩ ભૂલ સુધારો' થી પાછું ખેંચી શકાશે)"))return;
+ if(DB){J.forEach(o=>{if(!o.x.id)return;const nx={...o.x,cl:(o.x.cl||[]).concat(o.add)};delete nx.id;DB.doc("hisab/"+o.x.id).set(nx).catch(()=>alert("સેવ થયું નહીં"))})}
+ else{J.forEach(o=>{h[o.i]={...o.x,cl:(o.x.cl||[]).concat(o.add)}});save(h);render()}};
 window.ekd=i=>{const h=load(),x=h[i];if(!x||!(x.cl||[]).length)return;const l=x.cl[x.cl.length-1];
  if(confirm("છેલ્લી જમા ભૂલ સુધારવી છે?\n"+fd(l.dt)+" · "+l.k+" · "+l.n))emSave(i,{...x,cl:x.cl.slice(0,-1)},h)};
 /* જમા ફિલ્ટર (રિફિલ બોક્સ): બાદ બોક્સમાં લખેલા ખાલી બાકી / પૈસા બાકી રિમાર્ક અહીં આવે. પસંદ કરો → આજની તારીખે જમા */
@@ -723,8 +736,15 @@ const dkey=x=>((x.d&&x.d.dt)||"")+"|"+((x.d&&x.d.nm)||"").trim().toLowerCase();
 const sm=x=>{const kh=n(x.d.khIn)+n(x.d.fh)+(x.xs||[]).reduce((a,e)=>a+e.a,0);return{kh,exp:x.tot-n(x.d.onl)-kh-n(x.d.of)}};
 const inR=x=>{const a=$("fa").value,b=$("fb").value,d=x.d.dt||"";return(!a||d>=a)&&(!b||d<=b)};
 const histPageSize=8;let histShown=histPageSize;
+var GM=["જાન્યુઆરી","ફેબ્રુઆરી","માર્ચ","એપ્રિલ","મે","જૂન","જુલાઈ","ઓગસ્ટ","સપ્ટેમ્બર","ઓક્ટોબર","નવેમ્બર","ડિસેમ્બર"];
+function mfR(){const s=$("fm");if(!s)return;const c={};load().forEach(x=>{const m=((x.d&&x.d.dt)||"").slice(0,7);if(m.length===7)c[m]=(c[m]||0)+1});
+ const ks=Object.keys(c).sort().reverse(),h='<option value="">📅 બધા મહિના</option>'+ks.map(k=>'<option value="'+k+'">'+GM[+k.slice(5)-1]+" "+k.slice(0,4)+" ("+c[k]+")</option>").join("");
+ if(s.dataset.h!==h){s.innerHTML=h;s.dataset.h=h}
+ const a=$("fa").value,b=$("fb").value;let sel="";
+ if(a&&b&&a.slice(0,7)===b.slice(0,7)&&a.slice(8)==="01"){const y=+a.slice(0,4),m=+a.slice(5,7);if(+b.slice(8)===new Date(y,m,0).getDate()&&c[a.slice(0,7)])sel=a.slice(0,7)}
+ s.value=sel}
 function render(){
- $("emsum").innerHTML=emS();emSel();
+ $("emsum").innerHTML=emS();emSel();trR();mfR();
  const q=$("hs").value.trim().toLocaleLowerCase();
  const L=load().map((x,i)=>[x,i]).filter(([x])=>{
   const d=x.d.dt||"",name=x.d.nm||"",search=[d,fd(d),name].join(" ").toLocaleLowerCase();
@@ -736,8 +756,24 @@ function render(){
  $("hist").innerHTML=shown.length?shown.map(([x,i])=>'<div class="hi"><span onclick="openH('+i+')" style="cursor:pointer">'+fd(x.d.dt)+' '+esc(x.d.nm||"")+emBadge(x)+'</span><span>'+f(x.act)+' <b style="color:'+(Math.abs(x.diff)<.5?"var(--ok)":"var(--bad)")+'">'+(Math.abs(x.diff)<.5?"✓":(x.diff>0?"+":"-")+Math.round(Math.abs(x.diff)))+'</b><span class="x" style="color:inherit" onclick="pH('+i+')">🖨️</span><span class="x" onclick="del('+i+')">🗑</span></span></div>'+emRow(x,i)).join(""):'<div class="cs">આ ફિલ્ટરમાં કોઈ હિસાબ નથી</div>';
  const more=Math.min(histPageSize,L.length-shown.length),button=$("hm");
  button.style.display=more?"block":"none";
- button.textContent="વધુ "+more+" હિસાબ બતાવો";
-}function pp(){document.body.classList.add("pp");const cl=()=>{document.body.classList.remove("pp");$("pv").innerHTML=""};window.onafterprint=cl;setTimeout(cl,120000);window.print()}
+ button.textContent="વધુ "+more+" હિસાબ બતાવો";chR(L);
+}
+var CO=false;
+window.chTg=()=>{CO=!CO;render()};
+function chR(L){const w=$("chw");if(!w)return;
+ const D=L.map(([x])=>x).filter(x=>x.d.dt).slice(0,31).reverse();
+ if(D.length<2){w.innerHTML="";return}
+ const hd='<div class="cs" style="text-align:left;margin:0 0 8px"><b>📈 રોજ નો હિસાબ ('+D.length+' દિવસ)</b> <span class="pl" style="width:auto;border-radius:14px;padding:0 10px;margin-left:6px;font-size:12px" onclick="chTg()">'+(CO?"બંધ ▲":"ખોલો ▾")+'</span></div>';
+ if(!CO){w.innerHTML=hd;return}
+ const V=D.map(x=>+x.act||0),mx=Math.max(...V,1),av=V.reduce((a,b)=>a+b,0)/V.length,iM=V.indexOf(Math.max(...V)),iN=V.indexOf(Math.min(...V));
+ const W=320,H=180,pl=38,pb=22,pt=10,pr=6,cw=(W-pl-pr)/D.length,bw=Math.max(2,cw*.7),ch=H-pb-pt,Y=v=>pt+ch-ch*v/mx;
+ const k=v=>v>=1e5?(v/1e5).toFixed(1).replace(".0","")+"L":v>=1e3?Math.round(v/1e3)+"K":Math.round(v);
+ const step=D.length>20?3:D.length>10?2:1;let g="";
+ [0,.5,1].forEach(t=>{const y=Y(mx*t);g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'" stroke="currentColor" opacity=".15"/><text x="'+(pl-4)+'" y="'+(y+3)+'" text-anchor="end" font-size="9" fill="currentColor" opacity=".7">'+k(mx*t)+'</text>'});
+ D.forEach((x,i)=>{const bx=pl+i*cw+(cw-bw)/2,y=Y(V[i]);g+='<rect x="'+bx+'" y="'+y+'" width="'+bw+'" height="'+(pt+ch-y)+'" rx="2" fill="'+(i===iM?"#2e9e5b":i===iN?"#d9534f":"#2b5f9e")+'"><title>'+fd(x.d.dt)+": "+Math.round(V[i])+'</title></rect>';if(i%step===0)g+='<text x="'+(bx+bw/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="currentColor" opacity=".7">'+x.d.dt.slice(8)+'</text>'});
+ const ya=Y(av);g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+ya+'" y2="'+ya+'" stroke="#c98a1a" stroke-width="1.5" stroke-dasharray="4 3"/>';
+ w.innerHTML=hd+'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block" role="img" aria-label="રોજ ના હિસાબ નો ચાર્ટ">'+g+'</svg><div class="cs" style="text-align:left;margin:6px 0 10px">સરેરાશ <b>'+f(av)+'</b> (પીળી લાઈન)<br>🟢 સૌથી વધુ: '+fd(D[iM].d.dt)+" · "+f(V[iM])+'<br>🔴 સૌથી ઓછું: '+fd(D[iN].d.dt)+" · "+f(V[iN])+'</div>'}
+function pp(){document.body.classList.add("pp");const cl=()=>{document.body.classList.remove("pp");$("pv").innerHTML=""};window.onafterprint=cl;setTimeout(cl,120000);window.print()}
 window.pH=i=>{if((tot||act)&&!confirm("અત્યારનો હિસાબ આ સેવ કરેલા હિસાબથી બદલાઈ જશે. આગળ વધો?"))return;openH(i);dl("print")};
 function blk(x,G){const d=x.d,tr=a=>"<tr>"+a.map(v=>"<td>"+v+"</td>").join("")+"</tr>";
  let tot=0;
@@ -759,7 +795,25 @@ function pR(){const L=load().filter(inR).sort((a,b)=>(a.d.dt||"").localeCompare(
  const pv=$("pv");pv.style.cssText="display:block;position:absolute;left:-9999px;top:0;font-size:11px;width:741px";
  pv.querySelectorAll(".slip > .db").forEach(el=>{const h=el.getBoundingClientRect().height,target=515;if(h>target){const z=target/h;el.style.transform="scale("+z+")";el.style.transformOrigin="top left";el.style.width=(100/z)+"%"}});
  pv.style.cssText="";pv.style.setProperty("--w","741px");pv.style.setProperty("--z",1);pp()}window.openH=i=>{const x=load()[i];ids().filter(k=>/^[ev]\d$/.test(k)).forEach(k=>{$(k).value=""});Object.keys(x.d).forEach(k=>{if($(k))$(k).value=x.d[k]});xs=(x.xs||[]).map(e=>({...e}));if(!x.xs&&x.exps)x.exps.forEach(e=>xs.push({c:e.c,a:e.a,r:e.nt||""}));if(n(x.d.khIn))xs.push({c:"અન્ય",a:n(x.d.khIn),r:""});$("khIn").value="";$("fh").value=x.d.fh||"";$("xtra").value=x.d.xtra||"";$("xtraR").value=x.d.xtraR||"";$("xtraS").value=x.d.xtraS||"";xtT();xs=xs.filter(e=>{if(e.c==="ફૂલ હાર"){$("fh").value=n($("fh").value)+e.a;return false}return true});cz=(x.cz||[]).map(e=>({...e}));rC();rX();rU();rH();calc();__sv=curSt();scrollTo(0,0)};
-window.del=i=>{const h=load();if(h[i]&&!confirm("🗑 આ હિસાબ કાઢી નાખવો છે?\n"+fd(h[i].d.dt)+" "+(h[i].d.nm||"")))return;if(DB&&h[i]&&h[i].id){DB.doc("hisab/"+h[i].id).delete().catch(()=>alert("કાઢી શકાયું નહીં"));return}h.splice(i,1);save(h);render()};
+function delPop(x,ok){const o=document.createElement("div");o.className="np";o.style.cssText="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px";
+ o.innerHTML='<div class="card" style="width:100%;max-width:340px;margin:0;text-align:center"><div style="font-size:34px">🗑</div><h2 style="margin:6px 0">આ હિસાબ કાઢી નાખવો છે?</h2><div style="font-size:16px;margin:8px 0"><b>'+fd(x.d.dt)+'</b> '+esc(x.d.nm||"")+'<br>'+f(x.act)+'</div><div class="cs" style="margin-bottom:12px">કાઢ્યા પછી નીચે "♻️ કાઢેલા હિસાબ" માંથી પાછો લાવી શકાશે.</div><div style="display:flex;gap:8px"><button type="button" class="s" id="dpN" style="flex:1;margin:0">❌ ના, રહેવા દો</button><button type="button" id="dpY" disabled style="flex:1;margin:0;background:#c92a2a;color:#fff;opacity:.45">🗑 હા, કાઢો</button></div></div>';
+ document.body.appendChild(o);const c=()=>o.remove(),Y=o.querySelector("#dpY");o.querySelector("#dpN").onclick=c;Y.onclick=()=>{c();ok()};o.onclick=e=>{if(e.target===o)c()};setTimeout(()=>{Y.disabled=false;Y.style.opacity=1},1000)}
+window.del=i=>{const x=load()[i];if(!x)return;delPop(x,()=>{trAdd(x);if(DB&&x.id){DB.doc("hisab/"+x.id).delete().catch(()=>alert("કાઢી શકાયું નહીં"));return}const h=load(),j=h.findIndex(y=>dkey(y)===dkey(x));if(j<0)return;h.splice(j,1);save(h);render()})};
+/* ===== ♻️ કાઢેલા હિસાબ (રિસાયકલ બિન) – આ ફોન/બ્રાઉઝરમાં છેલ્લા 50 ===== */
+var TO=false;
+function trL(){try{return JSON.parse(localStorage.getItem("hisab_trash")||"[]")}catch(e){return[]}}
+function trS(T){try{localStorage.setItem("hisab_trash",JSON.stringify(T.slice(0,50)))}catch(e){}}
+function trAdd(x){const y={...x};delete y.id;const T=trL().filter(o=>dkey(o.x)!==dkey(y));T.unshift({at:Date.now(),x:y});trS(T)}
+window.trTg=()=>{TO=!TO;trR()};
+window.trBack=k=>{const T=trL(),o=T[k];if(!o)return;const x={...o.x};
+ if(load().some(y=>dkey(y)===dkey(x))&&!confirm("⚠️ આ તારીખ/નામનો હિસાબ હમણાં પણ છે.\nપાછો લાવેલા હિસાબથી તે બદલવો છે?"))return;
+ const done=()=>{const T2=trL();T2.splice(T2.findIndex(z=>dkey(z.x)===dkey(x)),1);trS(T2);trR()};
+ if(DB){const nid="D"+hs(dkey(x));DB.doc("hisab/"+nid).set({...x,ts:x.ts||Date.now()}).then(done).catch(()=>alert("પાછો આવ્યો નહીં"))}
+ else{const h=load().filter(y=>dkey(y)!==dkey(x));h.unshift(x);save(h);render();done()}};
+window.trDel=k=>{const T=trL();if(!T[k]||!confirm("❌ આ હિસાબ કાયમ માટે કાઢી નાખવો છે?"))return;T.splice(k,1);trS(T);trR()};
+function trR(){const w=$("trw");if(!w)return;const T=trL();if(!T.length){w.innerHTML="";return}
+ const b='style="width:auto;border-radius:14px;padding:0 10px;margin:0 0 0 6px;font-size:12px"';
+ w.innerHTML='<div class="cs" style="text-align:left;margin-top:10px"><b>♻️ કાઢેલા હિસાબ ('+T.length+')</b> <span class="pl" '+b+' onclick="trTg()">'+(TO?"બંધ ▲":"ખોલો ▾")+'</span></div>'+(TO?T.map((o,k)=>'<div class="hi"><span>'+fd(o.x.d.dt)+" "+esc(o.x.d.nm||"")+" · "+f(o.x.act)+'</span><span><span class="pl" '+b+' onclick="trBack('+k+')">↩ પાછો લાવો</span><span class="x" onclick="trDel('+k+')">✕</span></span></div>').join(""):"")}
 $("sv").onclick=async()=>{calc();
   if(!tot&&!act&&!xs.some(e=>n(e.a))){alert("⚠️ હિસાબ ખાલી (₹0) છે, એટલે સેવ નહીં થાય.\n\nપહેલા આંકડા ભરો.");return}
  {const P=pendOf(curEntry()).filter(p=>p.pend>0),bad=(m)=>{alert(m);const c=$("deductCard");if(c)c.scrollIntoView({behavior:"smooth",block:"center"})};
@@ -829,11 +883,12 @@ async function dapp(){let t="";try{t=await(await fetch(location.href)).text()}ca
  try{if(d)await d.save({filename:"refill-hisab.html",data:t});else{const u=URL.createObjectURL(new Blob([t],{type:"text/html;charset=utf-8"}));const a=document.createElement("a");a.href=u;a.download="refill-hisab.html";document.body.appendChild(a);a.click();a.remove()}}catch(e){if(e&&e.code!=="declined")alert("ડાઉનલોડ ન થયું: "+(e.message||e.code))}
 }
 $("da").onclick=dapp;
-$("pr").onclick=()=>rptOpen();$("pr2").onclick=async()=>{if(await $("sv").onclick())dl("print")};
+$("pr").onclick=()=>rptOpen();$("bk2").onclick=()=>$("bk").onclick();$("sv2").onclick=async()=>{const ok=await $("sv").onclick();if(ok){const b=$("sv2");b.textContent="✅ સેવ થયું";setTimeout(()=>b.textContent="💾 સેવ",1500)}};$("pr2").onclick=()=>{calc();dl("print")};
 $("rp").onclick=pR;
 ["fa","fb"].forEach(i=>$(i).addEventListener("change",()=>{histShown=histPageSize;render()}));
 $("hs").addEventListener("input",()=>{histShown=histPageSize;render()});
 $("clearHist").onclick=()=>{$("hs").value="";$("fa").value="";$("fb").value="";histShown=histPageSize;render()};
+$("fm").addEventListener("change",function(){const v=this.value;if(v){const y=+v.slice(0,4),m=+v.slice(5,7);$("fa").value=v+"-01";$("fb").value=v+"-"+String(new Date(y,m,0).getDate()).padStart(2,"0")}else{$("fa").value="";$("fb").value=""}histShown=histPageSize;render()});
 $("hm").onclick=()=>{histShown+=histPageSize;render()};
 const hs=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return(h>>>0).toString(36)};
 const dlf=(name,data,type)=>{const u=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)};
